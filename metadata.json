@@ -1,0 +1,6 @@
+{
+  "name": "Cultrahus Portal",
+  "description": "Event delegate and ticket registration portal with unique badge codes, real-time Firebase synchronization, and an administrative dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
