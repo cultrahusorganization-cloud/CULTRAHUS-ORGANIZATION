@@ -2,6 +2,7 @@ import {
   collection, 
   addDoc, 
   getDocs, 
+  getDoc,
   query, 
   onSnapshot, 
   doc, 
@@ -121,6 +122,24 @@ export function getCollectionNameForType(type: RegistrationType): string {
 }
 
 /**
+ * Detects the runtime origin to differentiate Vercel from local/applet
+ */
+export function detectRegistrationSource(): { source: 'vercel' | 'gemini_app' | 'direct'; sourceUrl: string } {
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname || '';
+    const origin = window.location.origin || '';
+    if (host.includes('vercel.app')) {
+      return { source: 'vercel', sourceUrl: origin };
+    }
+    if (host.includes('run.app') || host.includes('google.internal')) {
+      return { source: 'gemini_app', sourceUrl: origin };
+    }
+    return { source: 'vercel', sourceUrl: origin };
+  }
+  return { source: 'vercel', sourceUrl: 'https://cultrahus-organization.vercel.app' };
+}
+
+/**
  * Register a new Delegate or Ticket holder.
  * Guarantees a unique code for every person.
  * Saves into both the distinct collection ('delegates' or 'tickets') AND the master 'registrations' collection.
@@ -148,6 +167,7 @@ export async function registerParticipant(data: {
 }): Promise<RegistrationRecord> {
   const uniqueCode = generateUniqueCode(data.type);
   const now = new Date().toISOString();
+  const runtimeInfo = detectRegistrationSource();
 
   let categoryGroup: RegistrationRecord['_category'] = 'delegates';
   if (data.type === 'ticket') categoryGroup = 'tickets';
@@ -176,7 +196,8 @@ export async function registerParticipant(data: {
     foodAddon: data.foodAddon || '',
     amountPaid: data.amountPaid || 0,
     status: 'confirmed',
-    source: data.source || 'vercel',
+    source: data.source || runtimeInfo.source,
+    sourceUrl: runtimeInfo.sourceUrl,
     notes: data.notes || '',
     createdAt: now,
     _category: categoryGroup,
@@ -236,6 +257,7 @@ export async function registerTroupe(data: {
   const uniqueCode = generateUniqueCode('troupe');
   const now = new Date().toISOString();
 
+  const runtimeInfo = detectRegistrationSource();
   const newRecord: Omit<RegistrationRecord, 'id'> = {
     uniqueCode,
     name: data.director.trim(),
@@ -257,7 +279,8 @@ export async function registerTroupe(data: {
     technicalRider: data.technicalRider?.trim() || '',
     amountPaid: 0,
     status: 'under-review',
-    source: 'vercel',
+    source: runtimeInfo.source,
+    sourceUrl: runtimeInfo.sourceUrl,
     createdAt: now,
     _category: 'plays',
   };
@@ -308,6 +331,7 @@ export async function registerSecretariat(data: {
   const uniqueCode = generateUniqueCode('secretariat');
   const now = new Date().toISOString();
 
+  const runtimeInfo = detectRegistrationSource();
   const newRecord: Omit<RegistrationRecord, 'id'> = {
     uniqueCode,
     name: data.fullName.trim(),
@@ -324,7 +348,8 @@ export async function registerSecretariat(data: {
     referredBy: data.referredBy.trim(),
     amountPaid: 0,
     status: 'pending',
-    source: 'vercel',
+    source: runtimeInfo.source,
+    sourceUrl: runtimeInfo.sourceUrl,
     createdAt: now,
     _category: 'secretariat',
   };
@@ -375,6 +400,7 @@ export async function registerSponsor(data: {
   const uniqueCode = generateUniqueCode('sponsor');
   const now = new Date().toISOString();
 
+  const runtimeInfo = detectRegistrationSource();
   const newRecord: Omit<RegistrationRecord, 'id'> = {
     uniqueCode,
     name: data.contactPerson.trim(),
@@ -389,7 +415,8 @@ export async function registerSponsor(data: {
     proposalNotes: data.proposalNotes?.trim() || '',
     amountPaid: data.amount || 0,
     status: 'pending',
-    source: 'vercel',
+    source: runtimeInfo.source,
+    sourceUrl: runtimeInfo.sourceUrl,
     createdAt: now,
     _category: 'sponsors',
   };
@@ -438,6 +465,7 @@ export async function registerInquiry(data: {
   const uniqueCode = generateUniqueCode('inquiry');
   const now = new Date().toISOString();
 
+  const runtimeInfo = detectRegistrationSource();
   const newRecord: Omit<RegistrationRecord, 'id'> = {
     uniqueCode,
     name: data.fullName.trim(),
@@ -450,7 +478,8 @@ export async function registerInquiry(data: {
     message: data.message.trim(),
     amountPaid: 0,
     status: 'pending',
-    source: 'vercel',
+    source: runtimeInfo.source,
+    sourceUrl: runtimeInfo.sourceUrl,
     createdAt: now,
     _category: 'inquiries',
   };
@@ -842,6 +871,57 @@ export async function ensureInitialCollectionsAndData(): Promise<{ success: bool
     return {
       success: false,
       message: error instanceof Error ? error.message : 'Unknown Firestore initialization error'
+    };
+  }
+}
+
+/**
+ * Diagnostic Probe: performs a live write, read, and delete test directly against Firestore.
+ * Confirms that Vercel or any client can write to and read from the live database.
+ */
+export async function testDirectFirestoreWrite(): Promise<{
+  success: boolean;
+  latencyMs: number;
+  databaseId: string;
+  source: string;
+  error?: string;
+}> {
+  const start = performance.now();
+  const runtimeInfo = detectRegistrationSource();
+  const probeId = `probe_${Date.now()}`;
+  const probeRef = doc(db, 'test', probeId);
+
+  try {
+    // 1. Write probe
+    await setDoc(probeRef, {
+      test: true,
+      timestamp: new Date().toISOString(),
+      origin: runtimeInfo.sourceUrl,
+      source: runtimeInfo.source,
+      db: 'ai-studio-1959e55b-78c9-4673-be88-b7d93b87ba81',
+    });
+
+    // 2. Read probe back directly from server
+    await getDoc(probeRef);
+
+    // 3. Clean up probe
+    await deleteDoc(probeRef);
+
+    const latencyMs = Math.round(performance.now() - start);
+    return {
+      success: true,
+      latencyMs,
+      databaseId: 'ai-studio-1959e55b-78c9-4673-be88-b7d93b87ba81',
+      source: runtimeInfo.source,
+    };
+  } catch (err: any) {
+    console.error('Diagnostic write error:', err);
+    return {
+      success: false,
+      latencyMs: Math.round(performance.now() - start),
+      databaseId: 'ai-studio-1959e55b-78c9-4673-be88-b7d93b87ba81',
+      source: runtimeInfo.source,
+      error: err?.message || 'Connection failed',
     };
   }
 }

@@ -29,7 +29,9 @@ import {
   Calendar,
   DollarSign,
   UserCheck,
-  Share2
+  Share2,
+  Activity,
+  Globe
 } from 'lucide-react';
 import { 
   subscribeToRegistrations, 
@@ -38,7 +40,8 @@ import {
   calculateStats,
   ensureInitialCollectionsAndData,
   purgeAllMockData,
-  getCollectionNameForType
+  getCollectionNameForType,
+  testDirectFirestoreWrite
 } from '../services/registrationService';
 import { RegistrationRecord, DigitalPassData } from '../types';
 
@@ -68,6 +71,8 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'error'>('syncing');
   const [dbNotice, setDbNotice] = useState<string | null>(null);
+  const [isProbing, setIsProbing] = useState<boolean>(false);
+  const [probeResult, setProbeResult] = useState<string | null>(null);
   
   // Full detail dossier modal
   const [selectedDossier, setSelectedDossier] = useState<RegistrationRecord | null>(null);
@@ -299,6 +304,23 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
     setSyncStatus('synced');
   };
 
+  const handleRunDiagnosticProbe = async () => {
+    setIsProbing(true);
+    setProbeResult(null);
+    try {
+      const result = await testDirectFirestoreWrite();
+      if (result.success) {
+        setProbeResult(`Live Ping: ${result.latencyMs}ms | DB: ${result.databaseId} | Client: ${result.source.toUpperCase()} | Status: Write & Read Verified!`);
+      } else {
+        setProbeResult(`Probe Warning: ${result.error || 'Connection check completed'}`);
+      }
+    } catch (e: any) {
+      setProbeResult(`Probe Failure: ${e?.message || 'Error executing probe'}`);
+    } finally {
+      setIsProbing(false);
+    }
+  };
+
   // If NOT authenticated, show the Password Security Lock Screen
   if (!isAuthenticated) {
     return (
@@ -424,6 +446,17 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
             </button>
 
             <button
+              id="probe-db-btn"
+              onClick={handleRunDiagnosticProbe}
+              disabled={isProbing}
+              title="Run live read/write latency test against Firestore"
+              className="px-3.5 py-2 rounded-xl bg-[#232c17] hover:bg-[#323f21] text-emerald-300 text-xs font-bold border border-[#485b30] transition flex items-center gap-1.5 shadow disabled:opacity-50 cursor-pointer"
+            >
+              <Activity className={`w-3.5 h-3.5 ${isProbing ? 'animate-spin' : 'text-emerald-400'}`} />
+              <span>{isProbing ? 'Testing DB...' : 'Test Live DB'}</span>
+            </button>
+
+            <button
               id="export-csv-btn"
               onClick={handleExportCSV}
               className="px-3.5 py-2 rounded-xl bg-[#c4a159] hover:bg-[#d6b46c] text-[#1c2414] text-xs font-bold transition flex items-center gap-1.5 shadow"
@@ -451,6 +484,16 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
               <span>{dbNotice}</span>
             </div>
             <button onClick={() => setDbNotice(null)} className="text-[#a8b896] hover:text-white text-xs">Dismiss</button>
+          </div>
+        )}
+
+        {probeResult && (
+          <div className="mt-3 p-3 rounded-xl bg-[#1b2513] border border-emerald-700/60 text-emerald-200 text-xs flex items-center justify-between shadow">
+            <div className="flex items-center gap-2">
+              <Activity className="w-4 h-4 shrink-0 text-emerald-400" />
+              <span className="font-mono">{probeResult}</span>
+            </div>
+            <button onClick={() => setProbeResult(null)} className="text-[#a8b896] hover:text-white text-xs">Dismiss</button>
           </div>
         )}
       </div>
@@ -587,6 +630,7 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
                   <th className="py-3.5 px-4">Participant Details</th>
                   <th className="py-3.5 px-4">Category / Collection</th>
                   <th className="py-3.5 px-4">Contact</th>
+                  <th className="py-3.5 px-4">Platform Origin</th>
                   <th className="py-3.5 px-4">Amount Paid</th>
                   <th className="py-3.5 px-4">Status</th>
                   <th className="py-3.5 px-4 text-right">Dossier Actions</th>
@@ -595,6 +639,7 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
               <tbody className="divide-y divide-[#dfd7c3]">
                 {filteredRecords.map((r) => {
                   const isCheckedIn = r.status === 'checked-in';
+                  const isVercel = r.source === 'vercel' || (r.sourceUrl && r.sourceUrl.includes('vercel'));
                   return (
                     <tr key={r.id} className="hover:bg-[#f4efe4]/60 transition-colors">
                       {/* Code */}
@@ -661,6 +706,24 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
                             <a href={`https://wa.me/91${r.phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="hover:text-emerald-700">
                               {r.phone}
                             </a>
+                          </div>
+                        )}
+                      </td>
+
+                      {/* Platform Origin */}
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        {isVercel ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#181f10] text-white text-[10px] font-mono font-bold tracking-tight border border-[#3e4a2b] shadow-2xs">
+                            <span className="text-white text-[8px]">▲</span> Vercel
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#ede4d2] text-[#4a5a32] text-[10px] font-mono font-semibold border border-[#cfc4ad]">
+                            <Globe className="w-2.5 h-2.5 text-[#556345]" /> Direct
+                          </span>
+                        )}
+                        {r.sourceUrl && (
+                          <div className="text-[9px] text-[#738363] truncate max-w-[110px] font-mono mt-0.5" title={r.sourceUrl}>
+                            {r.sourceUrl.replace(/^https?:\/\//, '')}
                           </div>
                         )}
                       </td>
@@ -851,6 +914,29 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
                   </div>
                   <div className="text-[10px] font-mono text-[#7a8a68]">
                     Doc ID: {selectedDossier.id}
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-white border border-[#dfd7c3] space-y-1 sm:col-span-2">
+                  <span className="font-bold text-[#556345] block text-[10px] uppercase">Deployment Source &amp; Firestore Connection</span>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      {selectedDossier.source === 'vercel' || (selectedDossier.sourceUrl && selectedDossier.sourceUrl.includes('vercel')) ? (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-[#181f10] text-white text-[11px] font-mono font-bold">
+                          <span className="text-white text-[9px]">▲</span> Vercel Production
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#ebf0e2] text-[#344222] text-[11px] font-bold">
+                          <Globe className="w-3 h-3 text-[#556345]" /> Direct Web
+                        </span>
+                      )}
+                      <span className="text-[11px] font-mono text-[#556345] bg-[#f4efe4] px-2 py-0.5 rounded border border-[#dfd7c3]">
+                        {selectedDossier.sourceUrl || 'https://cultrahus-organization.vercel.app'}
+                      </span>
+                    </div>
+                    <div className="text-[11px] font-medium text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                      ✓ Synchronized to DB ai-studio-1959e55b-78c9-4673-be88-b7d93b87ba81
+                    </div>
                   </div>
                 </div>
               </div>

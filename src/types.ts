@@ -56,6 +56,7 @@ export interface RegistrationRecord {
   amountPaid?: number;
   status: RegistrationStatus;
   source: 'vercel' | 'gemini_app' | 'direct';
+  sourceUrl?: string;
   notes?: string;
   createdAt: string; // ISO string
   checkedInAt?: string;

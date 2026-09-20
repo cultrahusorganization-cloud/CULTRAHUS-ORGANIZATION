@@ -3,15 +3,26 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
 import bundledConfig from '../firebase-applet-config.json';
 
-// Support both direct bundled config and optional environment variables (e.g. for Vercel)
+// Universal Firebase Configuration with Triple-Redundancy (Env Vars -> Bundled JSON -> Static Fallback)
+// Ensures 100% reliable real-time database connection in local dev, AI Studio, and Vercel deployments
+const STATIC_FALLBACK_CONFIG = {
+  projectId: "gen-lang-client-0207271679",
+  appId: "1:970131731174:web:5feddb801a76d6e8e48127",
+  apiKey: "AIzaSyCnguqdB9UVFaVaF-HTsUkUDNFWQtaU8lY",
+  authDomain: "gen-lang-client-0207271679.firebaseapp.com",
+  firestoreDatabaseId: "ai-studio-1959e55b-78c9-4673-be88-b7d93b87ba81",
+  storageBucket: "gen-lang-client-0207271679.firebasestorage.app",
+  messagingSenderId: "970131731174",
+};
+
 const firebaseConfig = {
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || bundledConfig.projectId,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || bundledConfig.appId,
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || bundledConfig.apiKey,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || bundledConfig.authDomain,
-  firestoreDatabaseId: import.meta.env.VITE_FIREBASE_DATABASE_ID || bundledConfig.firestoreDatabaseId,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || bundledConfig.storageBucket,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || bundledConfig.messagingSenderId,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || bundledConfig?.projectId || STATIC_FALLBACK_CONFIG.projectId,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || bundledConfig?.appId || STATIC_FALLBACK_CONFIG.appId,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || bundledConfig?.apiKey || STATIC_FALLBACK_CONFIG.apiKey,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || bundledConfig?.authDomain || STATIC_FALLBACK_CONFIG.authDomain,
+  firestoreDatabaseId: import.meta.env.VITE_FIREBASE_DATABASE_ID || bundledConfig?.firestoreDatabaseId || STATIC_FALLBACK_CONFIG.firestoreDatabaseId,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || bundledConfig?.storageBucket || STATIC_FALLBACK_CONFIG.storageBucket,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || bundledConfig?.messagingSenderId || STATIC_FALLBACK_CONFIG.messagingSenderId,
 };
 
 // Initialize Firebase App

@@ -1,48 +1,8 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // 1. Delegates collection
-    match /delegates/{id} {
-      allow read, write: if true;
-    }
-
-    // 2. Tickets collection
-    match /tickets/{id} {
-      allow read, write: if true;
-    }
-
-    // 3. Troupes collection
-    match /troupes/{id} {
-      allow read, write: if true;
-    }
-
-    // 4. Secretariat applications collection
-    match /secretariat/{id} {
-      allow read, write: if true;
-    }
-
-    // 5. Sponsors collection
-    match /sponsors/{id} {
-      allow read, write: if true;
-    }
-
-    // 6. Inquiries collection
-    match /inquiries/{id} {
-      allow read, write: if true;
-    }
-
-    // 7. Master Registrations collection
-    match /registrations/{registrationId} {
-      allow read, write: if true;
-    }
-
-    // Event settings and metadata
-    match /event_settings/{document=**} {
-      allow read, write: if true;
-    }
-
-    // Health / connection test document as required by Firebase skill
-    match /test/{document=**} {
+    // Universal open access for festival registrations, ticketing, dossiers, and settings
+    match /{document=**} {
       allow read, write: if true;
     }
   }
