@@ -4,9 +4,7 @@ import {
   Search, 
   Download, 
   RefreshCw, 
-  ExternalLink, 
   CheckCircle, 
-  Clock, 
   Trash2, 
   Printer, 
   Copy, 
@@ -19,7 +17,19 @@ import {
   Award,
   Filter,
   MapPin,
-  Sparkles
+  Lock,
+  Eye,
+  EyeOff,
+  AlertCircle,
+  LogOut,
+  FileText,
+  X,
+  Building2,
+  Phone,
+  Calendar,
+  DollarSign,
+  UserCheck,
+  Share2
 } from 'lucide-react';
 import { 
   subscribeToRegistrations, 
@@ -37,6 +47,19 @@ interface OrganizerPortalProps {
 }
 
 export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerated }) => {
+  // Authentication state
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    try {
+      return sessionStorage.getItem('cultrahus_admin_auth') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [passwordInput, setPasswordInput] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  // Portal records and state
   const [records, setRecords] = useState<RegistrationRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -45,8 +68,41 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'error'>('syncing');
   const [dbNotice, setDbNotice] = useState<string | null>(null);
+  
+  // Full detail dossier modal
+  const [selectedDossier, setSelectedDossier] = useState<RegistrationRecord | null>(null);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError(null);
+    if (passwordInput.trim() === 'adminisvansh') {
+      try {
+        sessionStorage.setItem('cultrahus_admin_auth', 'true');
+      } catch {
+        // ignore storage error
+      }
+      setIsAuthenticated(true);
+      setPasswordInput('');
+    } else {
+      setAuthError('Access Denied: Incorrect administrative password.');
+      setPasswordInput('');
+    }
+  };
+
+  const handleSignOut = () => {
+    try {
+      sessionStorage.removeItem('cultrahus_admin_auth');
+    } catch {
+      // ignore
+    }
+    setIsAuthenticated(false);
+    setPasswordInput('');
+    setSelectedDossier(null);
+  };
 
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     setLoading(true);
     setSyncStatus('syncing');
 
@@ -71,7 +127,7 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [isAuthenticated]);
 
   const stats = calculateStats(records);
 
@@ -93,7 +149,9 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
       (r.phone && r.phone.includes(q)) ||
       (r.organization && r.organization.toLowerCase().includes(q)) ||
       (r.troupeName && r.troupeName.toLowerCase().includes(q)) ||
-      (r.brandName && r.brandName.toLowerCase().includes(q))
+      (r.playTitle && r.playTitle.toLowerCase().includes(q)) ||
+      (r.brandName && r.brandName.toLowerCase().includes(q)) ||
+      (r.cityState && r.cityState.toLowerCase().includes(q))
     );
   });
 
@@ -105,26 +163,58 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
 
   const handleToggleCheckIn = async (record: RegistrationRecord) => {
     const nextStatus = record.status === 'checked-in' ? 'confirmed' : 'checked-in';
-    await updateParticipantStatus(record.id, nextStatus);
+    await updateParticipantStatus(record.id, nextStatus, record.type);
+    if (selectedDossier && selectedDossier.id === record.id) {
+      setSelectedDossier({ ...selectedDossier, status: nextStatus });
+    }
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (window.confirm(`Are you sure you want to remove registration for "${name}"? This will delete it from the registry.`)) {
-      await deleteParticipant(id);
+  const handleStatusChange = async (record: RegistrationRecord, newStatus: RegistrationRecord['status']) => {
+    await updateParticipantStatus(record.id, newStatus, record.type);
+    if (selectedDossier && selectedDossier.id === record.id) {
+      setSelectedDossier({ ...selectedDossier, status: newStatus });
+    }
+  };
+
+  const handleDelete = async (id: string, name: string, type?: RegistrationRecord['type']) => {
+    if (window.confirm(`Are you sure you want to permanently delete registration for "${name}" from Firestore?`)) {
+      await deleteParticipant(id, type);
+      if (selectedDossier && selectedDossier.id === id) {
+        setSelectedDossier(null);
+      }
     }
   };
 
   const handleExportCSV = () => {
     if (records.length === 0) return;
-    const headers = ['Unique Code', 'Category', 'Name', 'Email', 'Phone', 'Organization / College', 'Tier / Subcategory', 'Amount Paid', 'Status', 'Registered At'];
+    const headers = [
+      'Unique Code',
+      'Firestore Collection',
+      'Category Group',
+      'Name',
+      'Email',
+      'Phone',
+      'Organization / College / Troupe',
+      'Designation',
+      'City / State',
+      'Category / Tier / Track',
+      'Play Title / Troupe Name',
+      'Amount Paid (INR)',
+      'Status',
+      'Registered At'
+    ];
     const rows = records.map(r => [
-      `"${r.uniqueCode}"`,
+      `"${r.uniqueCode || ''}"`,
+      `"${getCollectionNameForType(r.type)}"`,
       `"${r._category || r.type}"`,
       `"${(r.name || '').replace(/"/g, '""')}"`,
       `"${r.email || ''}"`,
       `"${r.phone || ''}"`,
       `"${(r.organization || r.troupeName || r.brandName || '').replace(/"/g, '""')}"`,
+      `"${(r.designation || '').replace(/"/g, '""')}"`,
+      `"${(r.cityState || '').replace(/"/g, '""')}"`,
       `"${(r.ticketTier || r.participationCategory || r.department || r.sponsorTier || '').replace(/"/g, '""')}"`,
+      `"${(r.playTitle || '').replace(/"/g, '""')}"`,
       `"${r.amountPaid || 0}"`,
       `"${r.status || 'confirmed'}"`,
       `"${r.createdAt || ''}"`
@@ -150,33 +240,33 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
     let detail2Value: string = record.status || 'Confirmed';
 
     if (cat === 'tickets') {
-      title = `${record.tierName || 'Auditorium Pass'} (${record.quantity || 1} Pass)`;
-      detail1Label = 'Ticket Quantity';
-      detail1Value = `${record.quantity || 1} Pass(es)`;
-      detail2Label = 'Evening Inclusions';
-      detail2Value = 'Garba & DJ Night Included';
+      title = `${record.ticketTier?.toUpperCase() || 'CONCLAVE'} AUDITORIUM PASS`;
+      detail1Label = 'Tier & Seats';
+      detail1Value = `${record.ticketTier || 'Standard'} (${record.quantity || 1} seat${(record.quantity || 1) > 1 ? 's' : ''})`;
+      detail2Label = 'Food Hospitality';
+      detail2Value = record.foodAddon || 'General Food Court Access';
     } else if (cat === 'plays') {
-      title = `Troupe: ${record.troupeName || record.organization}`;
-      detail1Label = 'Play Title';
-      detail1Value = record.playTitle || 'Stage Drama';
-      detail2Label = 'Cast Size';
-      detail2Value = `${record.castCrewCount || 10} Artists`;
+      title = 'OFFICIAL DRAMA TROUPE ENTRY';
+      detail1Label = 'Play & Troupe';
+      detail1Value = `"${record.playTitle || 'Stage Play'}" • ${record.organization || record.troupeName || 'Society'}`;
+      detail2Label = 'Director / Cast';
+      detail2Value = `${record.name} (${record.castCrewCount || 10} members)`;
     } else if (cat === 'secretariat') {
-      title = `Secretariat Candidate: ${record.department || 'Outreach'}`;
-      detail1Label = 'Department';
-      detail1Value = record.department || 'Management';
-      detail2Label = 'Commitment';
-      detail2Value = record.timeCommitment || '10-15 hrs/wk';
+      title = 'EXECUTIVE YOUTH SECRETARIAT';
+      detail1Label = 'Council Wing';
+      detail1Value = record.department ? `${record.department} Division` : 'General Council';
+      detail2Label = 'Designation';
+      detail2Value = record.designation || 'Secretariat Officer';
     } else if (cat === 'sponsors') {
-      title = `Sponsor: ${record.brandName || record.organization}`;
-      detail1Label = 'Package';
-      detail1Value = record.sponsorTier || 'Partner';
-      detail2Label = 'Corporate Intent';
-      detail2Value = 'Brand Activation';
+      title = 'HONORARY CORPORATE PATRON';
+      detail1Label = 'Patronage Tier';
+      detail1Value = record.sponsorTier || 'Official Sponsor';
+      detail2Label = 'Brand';
+      detail2Value = record.organization || record.brandName || 'Partner Brand';
     }
 
     onPassGenerated({
-      type: record.type,
+      type: cat,
       code: record.uniqueCode,
       title,
       fullName: record.name,
@@ -186,22 +276,11 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
       detail1Value,
       detail2Label,
       detail2Value,
-      feePaid: record.amountPaid ? `₹${record.amountPaid.toLocaleString('en-IN')}` : 'Accredited / Waived',
-      status: record.status || 'Confirmed',
-      issuedIst: new Date(record.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+      seats: record.seats,
+      feePaid: record.amountPaid ? `₹${record.amountPaid.toLocaleString('en-IN')}` : 'Accredited Free',
+      status: record.status.toUpperCase(),
+      issuedIst: record.createdAt ? new Date(record.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) : undefined,
     });
-  };
-
-  const handleVerifyCollections = async () => {
-    setSyncStatus('syncing');
-    const res = await ensureInitialCollectionsAndData();
-    if (res.success) {
-      setDbNotice(res.message);
-      setSyncStatus('synced');
-    } else {
-      setDbNotice(`Sync notice: ${res.message}`);
-      setSyncStatus('synced');
-    }
   };
 
   const handlePurgeMock = async () => {
@@ -213,16 +292,102 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
     }
   };
 
+  const handleVerifyCollections = async () => {
+    setSyncStatus('syncing');
+    const res = await ensureInitialCollectionsAndData();
+    setDbNotice(res.message);
+    setSyncStatus('synced');
+  };
+
+  // If NOT authenticated, show the Password Security Lock Screen
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-[75vh] flex items-center justify-center px-4 py-16">
+        <div className="w-full max-w-md bg-[#242c18] border-2 border-[#52653a] rounded-3xl p-8 sm:p-10 shadow-2xl text-white relative overflow-hidden">
+          {/* Subtle watermark background glow */}
+          <div className="absolute -right-16 -top-16 w-44 h-44 rounded-full bg-[#5b6e41]/20 blur-3xl pointer-events-none" />
+          <div className="absolute -left-16 -bottom-16 w-44 h-44 rounded-full bg-[#c4a159]/20 blur-3xl pointer-events-none" />
+
+          <div className="relative z-10 text-center">
+            <div className="inline-flex p-4 rounded-2xl bg-[#344222] border border-[#5b6e41] text-[#e5d4aa] mb-5 shadow-inner">
+              <Lock className="w-8 h-8 text-[#c4a159]" />
+            </div>
+
+            <span className="inline-block px-3 py-1 rounded-full bg-[#3b4928] text-[#e5d4aa] text-[11px] font-bold uppercase tracking-widest border border-[#52653a] mb-2">
+              Cultrahus Administrative Secretariat
+            </span>
+
+            <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-white">
+              Restricted Admin Portal
+            </h1>
+            <p className="text-xs sm:text-sm text-[#b8c5a8] mt-2 mb-6">
+              Enter your administrative password to access the real-time Firebase attendee console and attendee dossiers.
+            </p>
+
+            {authError && (
+              <div className="mb-6 p-3.5 rounded-xl bg-rose-950/80 border border-rose-700/80 text-rose-200 text-xs font-semibold flex items-center gap-2 text-left">
+                <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                <span>{authError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleLogin} className="space-y-4 text-left">
+              <div>
+                <label className="block text-xs font-bold text-[#e5d4aa] uppercase tracking-wider mb-2">
+                  Admin Access Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="admin-password-input"
+                    type={showPassword ? 'text' : 'password'}
+                    value={passwordInput}
+                    onChange={(e) => setPasswordInput(e.target.value)}
+                    placeholder="Enter admin password..."
+                    autoFocus
+                    required
+                    className="w-full pl-4 pr-12 py-3 rounded-xl bg-[#181f10] border border-[#52653a] text-white placeholder-[#7d8e6a] text-sm focus:outline-none focus:border-[#c4a159] transition"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-3.5 text-[#a8b896] hover:text-white transition"
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                id="admin-login-btn"
+                type="submit"
+                className="w-full py-3.5 px-6 rounded-xl bg-[#c4a159] hover:bg-[#d6b46c] text-[#1c2414] font-bold text-sm tracking-wide transition shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                <span>Unlock Registry Console</span>
+              </button>
+            </form>
+
+            <div className="mt-6 pt-5 border-t border-[#3b4928] text-[11px] text-[#8e9e7c]">
+              Protected by Cultrahus Organization Security Protocols. Unauthorized access attempts are monitored and recorded.
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // When Authenticated, render the complete Admin Portal
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       {/* Top Banner */}
-      <div className="bg-[#242c18] text-[#f4efe4] rounded-3xl p-6 sm:p-8 shadow-xl border border-[#3e4a2b]">
+      <div className="bg-[#242c18] border-2 border-[#52653a] rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-3">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#3b4928] text-[#e5d4aa] text-xs font-bold uppercase tracking-wider border border-[#52653a]">
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Restricted Organizer Registration Registry</span>
+                <span>Authenticated Secretariat Portal</span>
               </span>
               <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#1b2212] text-[#c8d4bb] text-xs font-medium border border-[#3e4a2b]">
                 <MapPin className="w-3 h-3 text-[#c4a159]" />
@@ -233,8 +398,8 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
               Cultrahus Attendee Database
             </h1>
             <p className="text-xs sm:text-sm text-[#b8c5a8] mt-2 max-w-2xl">
-              Real-time Firestore database synchronization across distinct collections: 
-              <span className="text-[#e5d4aa] font-mono"> delegates, tickets, troupes, secretariat, sponsors, inquiries</span>.
+              Live Firestore synchronization across distinct collections: 
+              <span className="text-[#e5d4aa] font-mono"> delegates, tickets, troupes, secretariat, sponsors, inquiries, registrations</span>.
             </p>
           </div>
 
@@ -246,7 +411,7 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
               className="px-3.5 py-2 rounded-xl bg-rose-950/60 hover:bg-rose-900/80 text-rose-200 text-xs font-bold border border-rose-800/60 transition flex items-center gap-1.5 shadow"
             >
               <Trash2 className="w-3.5 h-3.5" />
-              <span>Remove Added Mock Data</span>
+              <span>Clean Test Data</span>
             </button>
 
             <button
@@ -254,135 +419,89 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
               onClick={handleVerifyCollections}
               className="px-3.5 py-2 rounded-xl bg-[#3b4928] hover:bg-[#4a5e33] text-[#e5d4aa] text-xs font-bold border border-[#52653a] transition flex items-center gap-1.5 shadow"
             >
-              <Database className="w-3.5 h-3.5" />
-              <span>Verify Collections</span>
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Sync Firestore</span>
             </button>
 
             <button
               id="export-csv-btn"
               onClick={handleExportCSV}
-              className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition flex items-center gap-1.5 border border-white/20"
+              className="px-3.5 py-2 rounded-xl bg-[#c4a159] hover:bg-[#d6b46c] text-[#1c2414] text-xs font-bold transition flex items-center gap-1.5 shadow"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Export CSV</span>
             </button>
 
-            <a
-              id="firebase-console-link"
-              href="https://console.firebase.google.com/project/gen-lang-client-0428383827/firestore/databases/ai-studio-1959e55b-78c9-4673-be88-b7d93b87ba81/data"
-              target="_blank"
-              rel="noreferrer"
-              className="px-3.5 py-2 rounded-xl bg-[#c4a159] hover:bg-[#b08e48] text-[#242c18] text-xs font-bold transition flex items-center gap-1.5 shadow"
+            <button
+              id="admin-logout-btn"
+              onClick={handleSignOut}
+              title="Lock Admin Portal and Sign Out"
+              className="px-3.5 py-2 rounded-xl bg-[#1b2212] hover:bg-[#2d381c] text-[#e5d4aa] text-xs font-bold border border-[#4a5a32] transition flex items-center gap-1.5 shadow cursor-pointer"
             >
-              <ExternalLink className="w-3.5 h-3.5" />
-              <span>Firebase Console</span>
-            </a>
+              <LogOut className="w-3.5 h-3.5 text-rose-300" />
+              <span>Lock Portal</span>
+            </button>
           </div>
         </div>
 
-        {/* Database Status Alert */}
-        <div className="mt-6 pt-4 border-t border-[#3e4a2b] flex flex-col sm:flex-row sm:items-center justify-between text-xs text-[#b8c5a8] gap-2">
-          <div className="flex items-center gap-2">
-            <span
-              className={`w-2.5 h-2.5 rounded-full ${
-                syncStatus === 'synced' ? 'bg-emerald-400 animate-pulse' : syncStatus === 'syncing' ? 'bg-amber-400' : 'bg-rose-400'
-              }`}
-            />
-            <span className="font-mono text-[11px]">
-              Database: <strong className="text-white">ai-studio-1959e55b-78c9-4673-be88-b7d93b87ba81</strong> (Live Sync Active)
-            </span>
+        {dbNotice && (
+          <div className="mt-4 p-3 rounded-xl bg-[#344222] border border-[#5b6e41] text-[#e5d4aa] text-xs flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Database className="w-3.5 h-3.5 shrink-0 text-[#c4a159]" />
+              <span>{dbNotice}</span>
+            </div>
+            <button onClick={() => setDbNotice(null)} className="text-[#a8b896] hover:text-white text-xs">Dismiss</button>
           </div>
+        )}
+      </div>
 
-          <div className="font-mono text-[11px] text-[#e5d4aa]">
-            Admin Lead: cultrahusorganization@gmail.com
-          </div>
+      {/* Real-time Metric Tiles */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+        <div className="p-4 rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
+          <div className="text-[11px] uppercase tracking-wider text-[#556345] font-bold">Total Enrolled</div>
+          <div className="text-xl sm:text-2xl font-serif font-extrabold text-[#242c18] mt-1">{stats.total}</div>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
+          <div className="text-[11px] uppercase tracking-wider text-[#556345] font-bold">Delegates</div>
+          <div className="text-xl sm:text-2xl font-serif font-extrabold text-[#242c18] mt-1">{stats.delegates}</div>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
+          <div className="text-[11px] uppercase tracking-wider text-[#556345] font-bold">Passes</div>
+          <div className="text-xl sm:text-2xl font-serif font-extrabold text-[#242c18] mt-1">{stats.tickets}</div>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
+          <div className="text-[11px] uppercase tracking-wider text-[#556345] font-bold">Troupes</div>
+          <div className="text-xl sm:text-2xl font-serif font-extrabold text-[#242c18] mt-1">{stats.plays}</div>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
+          <div className="text-[11px] uppercase tracking-wider text-[#556345] font-bold">Secretariat</div>
+          <div className="text-xl sm:text-2xl font-serif font-extrabold text-[#242c18] mt-1">{stats.secretariat}</div>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
+          <div className="text-[11px] uppercase tracking-wider text-[#556345] font-bold">Checked-In</div>
+          <div className="text-xl sm:text-2xl font-serif font-extrabold text-emerald-800 mt-1">{stats.checkedIn}</div>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center col-span-2 sm:col-span-1">
+          <div className="text-[11px] uppercase tracking-wider text-[#556345] font-bold">Revenue</div>
+          <div className="text-lg sm:text-xl font-serif font-extrabold text-[#242c18] mt-1">₹{stats.totalRevenue.toLocaleString('en-IN')}</div>
         </div>
       </div>
 
-      {/* Stats Counter Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-        <div className="bg-[#faf8f5] border border-[#cfc4ad] rounded-2xl p-4 text-center shadow-2xs">
-          <span className="text-[10px] uppercase font-bold text-[#556345] tracking-wider block mb-1">
-            Total Registrations
-          </span>
-          <span className="font-serif font-extrabold text-2xl text-[#242c18]">
-            {stats.total}
-          </span>
-        </div>
-
-        <div className="bg-[#faf8f5] border border-[#cfc4ad] rounded-2xl p-4 text-center shadow-2xs">
-          <span className="text-[10px] uppercase font-bold text-[#556345] tracking-wider block mb-1">
-            Delegates
-          </span>
-          <span className="font-serif font-extrabold text-2xl text-[#3b4928]">
-            {stats.delegates}
-          </span>
-        </div>
-
-        <div className="bg-[#faf8f5] border border-[#cfc4ad] rounded-2xl p-4 text-center shadow-2xs">
-          <span className="text-[10px] uppercase font-bold text-[#556345] tracking-wider block mb-1">
-            Auditorium Passes
-          </span>
-          <span className="font-serif font-extrabold text-2xl text-[#3b4928]">
-            {stats.tickets}
-          </span>
-        </div>
-
-        <div className="bg-[#faf8f5] border border-[#cfc4ad] rounded-2xl p-4 text-center shadow-2xs">
-          <span className="text-[10px] uppercase font-bold text-[#556345] tracking-wider block mb-1">
-            Plays &amp; Troupes
-          </span>
-          <span className="font-serif font-extrabold text-2xl text-[#3b4928]">
-            {stats.plays}
-          </span>
-        </div>
-
-        <div className="bg-[#faf8f5] border border-[#cfc4ad] rounded-2xl p-4 text-center shadow-2xs">
-          <span className="text-[10px] uppercase font-bold text-[#556345] tracking-wider block mb-1">
-            Secretariat
-          </span>
-          <span className="font-serif font-extrabold text-2xl text-[#3b4928]">
-            {stats.secretariat}
-          </span>
-        </div>
-
-        <div className="bg-[#faf8f5] border border-[#cfc4ad] rounded-2xl p-4 text-center shadow-2xs">
-          <span className="text-[10px] uppercase font-bold text-[#556345] tracking-wider block mb-1">
-            Sponsors
-          </span>
-          <span className="font-serif font-extrabold text-2xl text-[#3b4928]">
-            {stats.sponsors}
-          </span>
-        </div>
-
-        <div className="bg-[#faf8f5] border border-[#cfc4ad] rounded-2xl p-4 text-center shadow-2xs">
-          <span className="text-[10px] uppercase font-bold text-[#556345] tracking-wider block mb-1">
-            Checked-In
-          </span>
-          <span className="font-serif font-extrabold text-2xl text-emerald-700">
-            {stats.checkedIn}
-          </span>
-        </div>
-
-        <div className="bg-[#faf8f5] border border-[#cfc4ad] rounded-2xl p-4 text-center shadow-2xs">
-          <span className="text-[10px] uppercase font-bold text-[#556345] tracking-wider block mb-1">
-            Total Revenue
-          </span>
-          <span className="font-serif font-extrabold text-xl text-[#242c18]">
-            ₹{stats.totalRevenue.toLocaleString('en-IN')}
-          </span>
-        </div>
-      </div>
-
-      {/* Filter and Search Bar */}
-      <div className="bg-[#ede4d2] border-2 border-[#cfc4ad] rounded-3xl p-4 sm:p-6 shadow-sm space-y-4">
+      {/* Filter Tabs & Search Bar */}
+      <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center">
         {/* Category Tabs */}
         <div className="flex flex-wrap gap-2">
           {[
             { id: 'all', label: 'All Records', count: stats.total },
-            { id: 'delegates', label: 'Delegates (₹650)', count: stats.delegates },
+            { id: 'delegates', label: 'Delegates', count: stats.delegates },
             { id: 'tickets', label: 'Passes', count: stats.tickets },
-            { id: 'plays', label: 'Troupes & Plays', count: stats.plays },
+            { id: 'plays', label: 'Troupes', count: stats.plays },
             { id: 'secretariat', label: 'Secretariat', count: stats.secretariat },
             { id: 'sponsors', label: 'Sponsors', count: stats.sponsors },
             { id: 'inquiries', label: 'Inquiries', count: stats.inquiries },
@@ -391,7 +510,7 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
               key={tab.id}
               id={`filter-tab-${tab.id}`}
               onClick={() => setActiveCategory(tab.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
                 activeCategory === tab.id
                   ? 'bg-[#3b4928] text-[#f7f4ec] shadow-xs'
                   : 'bg-white/80 text-[#242c18] hover:bg-white border border-[#cfc4ad]'
@@ -409,12 +528,12 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
 
         {/* Search & Status Filters */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
+          <div className="relative flex-1 sm:w-72">
             <Search className="w-4 h-4 text-[#556345] absolute left-3.5 top-3" />
             <input
               id="admin-search-input"
               type="text"
-              placeholder="Search by Code (SNGM-...), Name, Email, Phone, or Institution..."
+              placeholder="Search Code, Name, Email, Phone..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 rounded-xl bg-white border border-[#cfc4ad] text-xs text-[#242c18] focus:outline-none focus:border-[#3b4928]"
@@ -439,20 +558,21 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
         </div>
       </div>
 
-      {/* Registrations Table / Grid */}
+      {/* Registrations Table */}
       <div className="bg-[#faf8f5] border-2 border-[#cfc4ad] rounded-3xl shadow-sm overflow-hidden">
         <div className="p-4 sm:p-5 border-b border-[#dfd7c3] flex items-center justify-between">
           <h2 className="font-serif font-bold text-lg text-[#242c18]">
-            Registered Attendees &amp; Dossiers ({filteredRecords.length})
+            Attendee Registry &amp; Dossiers ({filteredRecords.length})
           </h2>
           <span className="text-xs text-[#556345]">
-            Showing {filteredRecords.length} of {records.length} records
+            Showing {filteredRecords.length} of {records.length} records in Firestore
           </span>
         </div>
 
         {loading ? (
-          <div className="p-12 text-center text-xs text-[#556345]">
-            Loading real-time records from Firestore...
+          <div className="p-12 text-center text-xs text-[#556345] space-y-2">
+            <RefreshCw className="w-5 h-5 animate-spin mx-auto text-[#5b6e41]" />
+            <div>Loading live records from Firestore collections...</div>
           </div>
         ) : filteredRecords.length === 0 ? (
           <div className="p-12 text-center text-xs text-[#556345]">
@@ -463,13 +583,13 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
             <table className="w-full text-left text-xs text-[#242c18]">
               <thead className="bg-[#ede4d2] text-[#43522f] uppercase tracking-wider font-bold border-b border-[#dfd7c3]">
                 <tr>
-                  <th className="py-3 px-4">Tracking Code</th>
-                  <th className="py-3 px-4">Participant Details</th>
-                  <th className="py-3 px-4">Category / Tier</th>
-                  <th className="py-3 px-4">Contact</th>
-                  <th className="py-3 px-4">Amount Paid</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                  <th className="py-3.5 px-4">Tracking Code</th>
+                  <th className="py-3.5 px-4">Participant Details</th>
+                  <th className="py-3.5 px-4">Category / Collection</th>
+                  <th className="py-3.5 px-4">Contact</th>
+                  <th className="py-3.5 px-4">Amount Paid</th>
+                  <th className="py-3.5 px-4">Status</th>
+                  <th className="py-3.5 px-4 text-right">Dossier Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#dfd7c3]">
@@ -480,9 +600,13 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
                       {/* Code */}
                       <td className="py-3.5 px-4 font-mono font-bold whitespace-nowrap">
                         <div className="flex items-center gap-1.5">
-                          <span className="px-2 py-0.5 rounded bg-white border border-[#cfc4ad] text-[#242c18]">
+                          <button
+                            onClick={() => setSelectedDossier(r)}
+                            className="px-2 py-0.5 rounded bg-white hover:bg-[#f2ede2] border border-[#cfc4ad] text-[#242c18] transition text-left cursor-pointer"
+                            title="Click to view complete dossier"
+                          >
                             {r.uniqueCode}
-                          </span>
+                          </button>
                           <button
                             onClick={() => handleCopy(r.uniqueCode)}
                             title="Copy Code"
@@ -498,9 +622,12 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
 
                       {/* Participant */}
                       <td className="py-3.5 px-4">
-                        <div className="font-bold text-sm text-[#242c18]">
+                        <button
+                          onClick={() => setSelectedDossier(r)}
+                          className="font-bold text-sm text-[#242c18] hover:text-[#5b6e41] text-left block cursor-pointer transition"
+                        >
                           {r.name}
-                        </div>
+                        </button>
                         <div className="text-[11px] text-[#556345]">
                           {r.organization || r.troupeName || r.brandName || 'Independent Participant'}
                         </div>
@@ -523,8 +650,19 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
 
                       {/* Contact */}
                       <td className="py-3.5 px-4">
-                        <div>{r.email}</div>
-                        {r.phone && <div className="font-mono text-[11px] text-[#556345]">{r.phone}</div>}
+                        <div>
+                          <a href={`mailto:${r.email}`} className="hover:underline text-[#242c18]">
+                            {r.email}
+                          </a>
+                        </div>
+                        {r.phone && (
+                          <div className="font-mono text-[11px] text-[#556345] flex items-center gap-1 mt-0.5">
+                            <Phone className="w-2.5 h-2.5" />
+                            <a href={`https://wa.me/91${r.phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="hover:text-emerald-700">
+                              {r.phone}
+                            </a>
+                          </div>
+                        )}
                       </td>
 
                       {/* Amount Paid */}
@@ -536,7 +674,7 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
                       <td className="py-3.5 px-4">
                         <button
                           onClick={() => handleToggleCheckIn(r)}
-                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase transition ${
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase transition cursor-pointer ${
                             isCheckedIn
                               ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                               : 'bg-[#ede4d2] text-[#384626] border border-[#cfc4ad] hover:bg-[#e1d5bd]'
@@ -550,17 +688,30 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
                       {/* Actions */}
                       <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
+                          {/* Full Dossier Button */}
+                          <button
+                            onClick={() => setSelectedDossier(r)}
+                            title="View Complete Attendee Dossier"
+                            className="px-2.5 py-1 rounded-lg bg-[#ede4d2] hover:bg-[#dfd7c3] text-[#242c18] font-bold text-[11px] border border-[#cfc4ad] flex items-center gap-1 transition cursor-pointer"
+                          >
+                            <FileText className="w-3 h-3 text-[#5b6e41]" />
+                            <span className="hidden sm:inline">Dossier</span>
+                          </button>
+
+                          {/* Print Pass */}
                           <button
                             onClick={() => openPassModal(r)}
-                            title="View / Print Digital Credential"
-                            className="p-1.5 rounded-lg bg-[#3b4928] text-[#e5d4aa] hover:bg-[#4a5e33] transition"
+                            title="View / Print Digital Pass"
+                            className="p-1.5 rounded-lg bg-[#3b4928] text-[#e5d4aa] hover:bg-[#4a5e33] transition cursor-pointer"
                           >
                             <Printer className="w-3.5 h-3.5" />
                           </button>
+
+                          {/* Delete */}
                           <button
-                            onClick={() => handleDelete(r.id, r.name)}
+                            onClick={() => handleDelete(r.id, r.name, r.type)}
                             title="Delete Record"
-                            className="p-1.5 rounded-lg text-[#9b1c1c] hover:bg-rose-50 transition"
+                            className="p-1.5 rounded-lg text-[#9b1c1c] hover:bg-rose-50 transition cursor-pointer"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -574,6 +725,242 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
           </div>
         )}
       </div>
+
+      {/* FULL ATTENDEE DOSSIER MODAL */}
+      {selectedDossier && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-[#fcfbf9] border-2 border-[#52653a] rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 sm:p-8 space-y-6 text-[#242c18] relative animate-in fade-in zoom-in-95 duration-150">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-[#dfd7c3] pb-4">
+              <div>
+                <div className="flex items-center gap-2 flex-wrap mb-1">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#3b4928] text-[#e5d4aa]">
+                    {selectedDossier._category || selectedDossier.type}
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#dfd7c3] text-[#242c18] font-bold">
+                    Collection: {getCollectionNameForType(selectedDossier.type)}
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-100 text-emerald-800 font-bold">
+                    Status: {selectedDossier.status.toUpperCase()}
+                  </span>
+                </div>
+                <h2 className="font-serif text-2xl font-extrabold text-[#242c18]">
+                  {selectedDossier.name}
+                </h2>
+                <div className="text-xs text-[#556345] mt-0.5">
+                  {selectedDossier.organization || selectedDossier.troupeName || selectedDossier.brandName || 'Independent Participant'} • {selectedDossier.cityState || 'Bhiwadi'}
+                </div>
+              </div>
+
+              <button
+                onClick={() => setSelectedDossier(null)}
+                className="p-2 rounded-xl bg-[#ede4d2] hover:bg-[#dfd7c3] text-[#242c18] transition cursor-pointer"
+                title="Close Dossier"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Tracking Code Banner */}
+            <div className="p-4 rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div>
+                <div className="text-[10px] uppercase font-bold text-[#556345] tracking-wider">Accreditation Tracking Code</div>
+                <div className="font-mono text-lg font-extrabold text-[#242c18]">{selectedDossier.uniqueCode}</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleCopy(selectedDossier.uniqueCode)}
+                  className="px-3 py-1.5 rounded-xl bg-white border border-[#cfc4ad] text-xs font-bold text-[#242c18] hover:bg-[#f7f4ec] transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                  <span>{copiedCode === selectedDossier.uniqueCode ? 'Copied!' : 'Copy Code'}</span>
+                </button>
+                <button
+                  onClick={() => openPassModal(selectedDossier)}
+                  className="px-3 py-1.5 rounded-xl bg-[#3b4928] text-[#e5d4aa] text-xs font-bold hover:bg-[#4a5e33] transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Print Pass</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Complete Field Details Grid */}
+            <div className="space-y-4">
+              <h3 className="font-serif font-bold text-base text-[#242c18] border-b border-[#dfd7c3] pb-1">
+                Full Registration Dossier Details
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div className="p-3 rounded-xl bg-white border border-[#dfd7c3] space-y-1">
+                  <span className="font-bold text-[#556345] block text-[10px] uppercase">Contact Information</span>
+                  <div className="font-medium text-[#242c18]">{selectedDossier.email}</div>
+                  <div className="font-mono text-[#556345]">{selectedDossier.phone || 'No phone provided'}</div>
+                  <div className="pt-2 flex items-center gap-2">
+                    <a
+                      href={`mailto:${selectedDossier.email}`}
+                      className="px-2 py-1 rounded bg-[#ebf0e2] text-[#3b4928] font-bold text-[10px] hover:bg-[#dbe6cf]"
+                    >
+                      Email Attendee
+                    </a>
+                    {selectedDossier.phone && (
+                      <a
+                        href={`https://wa.me/91${selectedDossier.phone.replace(/\D/g, '')}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="px-2 py-1 rounded bg-emerald-100 text-emerald-800 font-bold text-[10px] hover:bg-emerald-200"
+                      >
+                        WhatsApp Chat
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-white border border-[#dfd7c3] space-y-1">
+                  <span className="font-bold text-[#556345] block text-[10px] uppercase">Institution &amp; Region</span>
+                  <div className="font-medium text-[#242c18]">{selectedDossier.organization || 'Independent'}</div>
+                  <div className="text-[#556345]">{selectedDossier.cityState || 'Bhiwadi, Rajasthan (NCR)'}</div>
+                  {selectedDossier.designation && (
+                    <div className="text-[11px] text-[#242c18] italic mt-1">Designation: {selectedDossier.designation}</div>
+                  )}
+                </div>
+
+                <div className="p-3 rounded-xl bg-white border border-[#dfd7c3] space-y-1">
+                  <span className="font-bold text-[#556345] block text-[10px] uppercase">Category &amp; Event Track</span>
+                  <div className="font-semibold text-[#242c18]">
+                    {selectedDossier.ticketTier || selectedDossier.participationCategory || selectedDossier.department || selectedDossier.sponsorTier || 'General'}
+                  </div>
+                  {selectedDossier.parliamentTrack && (
+                    <div className="text-[#556345]">Track: {selectedDossier.parliamentTrack}</div>
+                  )}
+                  {selectedDossier.foodAddon && (
+                    <div className="text-[#556345]">Hospitality: {selectedDossier.foodAddon}</div>
+                  )}
+                  {selectedDossier.seats && selectedDossier.seats.length > 0 && (
+                    <div className="font-mono text-[#556345]">Seats: {selectedDossier.seats.join(', ')}</div>
+                  )}
+                </div>
+
+                <div className="p-3 rounded-xl bg-white border border-[#dfd7c3] space-y-1">
+                  <span className="font-bold text-[#556345] block text-[10px] uppercase">Financials &amp; Timestamp</span>
+                  <div className="font-bold text-[#242c18] text-sm">
+                    {selectedDossier.amountPaid ? `₹${selectedDossier.amountPaid.toLocaleString('en-IN')}` : 'Accredited Free / ₹0'}
+                  </div>
+                  <div className="text-[#556345]">
+                    Enrolled: {selectedDossier.createdAt ? new Date(selectedDossier.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) : 'Recent'}
+                  </div>
+                  <div className="text-[10px] font-mono text-[#7a8a68]">
+                    Doc ID: {selectedDossier.id}
+                  </div>
+                </div>
+              </div>
+
+              {/* Extended fields for Troupe submissions */}
+              {(selectedDossier.playTitle || selectedDossier.synopsis || selectedDossier.technicalRider) && (
+                <div className="p-4 rounded-2xl bg-white border border-[#dfd7c3] space-y-2 text-xs">
+                  <span className="font-bold text-[#556345] block text-[10px] uppercase tracking-wider">
+                    Theatre Troupe &amp; Play Details
+                  </span>
+                  <div className="font-bold text-sm text-[#242c18]">
+                    Play Title: "{selectedDossier.playTitle}"
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px] text-[#556345]">
+                    <div>Director: <span className="text-[#242c18] font-medium">{selectedDossier.director || selectedDossier.name}</span></div>
+                    <div>Playwright: <span className="text-[#242c18] font-medium">{selectedDossier.playwright || 'Original'}</span></div>
+                    <div>Cast &amp; Crew: <span className="text-[#242c18] font-medium">{selectedDossier.castCrewCount || 1} members</span></div>
+                    <div>Duration: <span className="text-[#242c18] font-medium">{selectedDossier.durationMinutes || 45} mins</span></div>
+                  </div>
+                  {selectedDossier.synopsis && (
+                    <div className="pt-2 border-t border-[#ede4d2]">
+                      <span className="font-bold text-[#242c18] block text-[11px]">Play Synopsis:</span>
+                      <p className="text-[#556345] leading-relaxed mt-0.5">{selectedDossier.synopsis}</p>
+                    </div>
+                  )}
+                  {selectedDossier.technicalRider && (
+                    <div className="pt-2 border-t border-[#ede4d2]">
+                      <span className="font-bold text-[#242c18] block text-[11px]">Technical Rider / Stage Lights:</span>
+                      <p className="text-[#556345] leading-relaxed mt-0.5">{selectedDossier.technicalRider}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Extended fields for Secretariat applications */}
+              {(selectedDossier.whyJoin || selectedDossier.timeCommitment || selectedDossier.priorExperience) && (
+                <div className="p-4 rounded-2xl bg-white border border-[#dfd7c3] space-y-2 text-xs">
+                  <span className="font-bold text-[#556345] block text-[10px] uppercase tracking-wider">
+                    Secretariat Candidate Dossier
+                  </span>
+                  {selectedDossier.department && (
+                    <div>Department: <span className="font-bold text-[#242c18]">{selectedDossier.department}</span></div>
+                  )}
+                  {selectedDossier.whyJoin && (
+                    <div>
+                      <span className="font-bold text-[#242c18] block">Why Join Statement:</span>
+                      <p className="text-[#556345] mt-0.5 leading-relaxed">{selectedDossier.whyJoin}</p>
+                    </div>
+                  )}
+                  {selectedDossier.priorExperience && (
+                    <div>
+                      <span className="font-bold text-[#242c18] block">Prior Background:</span>
+                      <p className="text-[#556345] mt-0.5 leading-relaxed">{selectedDossier.priorExperience}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Extended fields for Sponsor & Inquiry */}
+              {(selectedDossier.proposalNotes || selectedDossier.message) && (
+                <div className="p-4 rounded-2xl bg-white border border-[#dfd7c3] space-y-2 text-xs">
+                  <span className="font-bold text-[#556345] block text-[10px] uppercase tracking-wider">
+                    Proposal / Inquiry Submission
+                  </span>
+                  {selectedDossier.subject && (
+                    <div className="font-bold text-[#242c18]">Subject: {selectedDossier.subject}</div>
+                  )}
+                  <p className="text-[#556345] leading-relaxed">
+                    {selectedDossier.proposalNotes || selectedDossier.message}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Status Manager and Action Bar */}
+            <div className="pt-4 border-t border-[#dfd7c3] flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-[#556345]">Update Status:</span>
+                <select
+                  value={selectedDossier.status}
+                  onChange={(e) => handleStatusChange(selectedDossier, e.target.value as RegistrationRecord['status'])}
+                  className="px-3 py-1.5 rounded-xl bg-white border border-[#cfc4ad] text-xs font-bold text-[#242c18] focus:outline-none focus:border-[#3b4928]"
+                >
+                  <option value="confirmed">Confirmed</option>
+                  <option value="checked-in">Checked In</option>
+                  <option value="pending">Pending</option>
+                  <option value="under-review">Under Review</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleDelete(selectedDossier.id, selectedDossier.name, selectedDossier.type)}
+                  className="px-3.5 py-1.5 rounded-xl bg-rose-50 text-rose-800 hover:bg-rose-100 text-xs font-bold border border-rose-200 transition flex items-center gap-1 cursor-pointer"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete Dossier</span>
+                </button>
+                <button
+                  onClick={() => setSelectedDossier(null)}
+                  className="px-4 py-1.5 rounded-xl bg-[#ede4d2] hover:bg-[#dfd7c3] text-[#242c18] text-xs font-bold transition cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

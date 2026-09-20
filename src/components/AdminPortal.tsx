@@ -32,6 +32,36 @@ interface Props {
 }
 
 export const AdminPortal: React.FC<Props> = ({ records, isLoading, onRefresh }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    try {
+      return sessionStorage.getItem('cultrahus_admin_auth') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [passwordInput, setPasswordInput] = useState('');
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  const handleAdminAuth = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordInput.trim() === 'adminisvansh') {
+      try {
+        sessionStorage.setItem('cultrahus_admin_auth', 'true');
+      } catch {}
+      setIsAuthenticated(true);
+      setAuthError(null);
+    } else {
+      setAuthError('Access Denied: Incorrect password.');
+    }
+  };
+
+  const handleSignOut = () => {
+    try {
+      sessionStorage.removeItem('cultrahus_admin_auth');
+    } catch {}
+    setIsAuthenticated(false);
+  };
+
   const { theme, config } = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'delegate' | 'ticket'>('all');
@@ -146,6 +176,35 @@ export const AdminPortal: React.FC<Props> = ({ records, isLoading, onRefresh }) 
     link.click();
     document.body.removeChild(link);
   };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center p-4">
+        <div className="max-w-md w-full p-8 rounded-2xl bg-[#242c18] border border-[#52653a] text-white text-center">
+          <Shield className="w-10 h-10 text-[#c4a159] mx-auto mb-4" />
+          <h2 className="text-xl font-bold font-serif mb-2">Restricted Admin Access</h2>
+          <p className="text-xs text-[#b8c5a8] mb-6">Enter administrative master password to unlock.</p>
+          {authError && <div className="mb-4 text-xs text-rose-400 font-bold">{authError}</div>}
+          <form onSubmit={handleAdminAuth} className="space-y-4">
+            <input
+              type="password"
+              value={passwordInput}
+              onChange={(e) => setPasswordInput(e.target.value)}
+              placeholder="Enter password..."
+              className="w-full px-4 py-3 rounded-xl bg-[#181f10] border border-[#52653a] text-white text-sm"
+              required
+            />
+            <button
+              type="submit"
+              className="w-full py-3 rounded-xl bg-[#c4a159] hover:bg-[#d6b46c] text-[#1c2414] font-bold text-sm transition"
+            >
+              Unlock Console
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div id="admin-portal-view" className="space-y-6">

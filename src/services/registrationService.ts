@@ -3,7 +3,6 @@ import {
   addDoc, 
   getDocs, 
   query, 
-  orderBy, 
   onSnapshot, 
   doc, 
   setDoc,
@@ -60,14 +59,32 @@ export const COLLECTION_SECRETARIAT = 'secretariat';
 export const COLLECTION_SPONSORS = 'sponsors';
 export const COLLECTION_INQUIRIES = 'inquiries';
 
-const LOCAL_STORAGE_KEY = 'cultrahus_registrations_cache_v3';
+const LOCAL_STORAGE_KEY = 'cultrahus_registrations_cache_v4';
+
+/**
+ * CRITICAL FIRESTORE UTILITY:
+ * Firestore throws a fatal exception if any property is `undefined`.
+ * This function recursively strips undefined and null values so Firestore addDoc/setDoc never fails.
+ */
+export function cleanForFirestore<T extends Record<string, any>>(data: T): Record<string, any> {
+  const result: Record<string, any> = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (value !== undefined && value !== null) {
+      if (typeof value === 'object' && !Array.isArray(value) && !(value instanceof Date)) {
+        result[key] = cleanForFirestore(value);
+      } else {
+        result[key] = value;
+      }
+    }
+  }
+  return result;
+}
 
 export function getLocalCache(): RegistrationRecord[] {
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (!raw) return [];
     const list = JSON.parse(raw);
-    // Filter out any lingering mock/seed items
     return Array.isArray(list) ? list.filter(r => !isMockRecord(r)) : [];
   } catch (e) {
     return [];
@@ -87,8 +104,7 @@ function isMockRecord(r: RegistrationRecord): boolean {
   if (!r) return false;
   if (r.id === 'cultrahus_lead_01' || r.id === 'seed_lead_01') return true;
   if (r.uniqueCode === 'SNGM-DEL-8801A') return true;
-  if (r.source === 'gemini_app') return true;
-  if (typeof r.notes === 'string' && (r.notes.includes('Initial organizational seed') || r.notes.includes('mock') || r.notes.includes('seed'))) return true;
+  if (typeof r.notes === 'string' && r.notes.includes('Initial organizational seed')) return true;
   return false;
 }
 
@@ -149,15 +165,15 @@ export async function registerParticipant(data: {
     designation: data.designation?.trim() || '',
     cityState: data.cityState?.trim() || 'Bhiwadi',
     type: data.type,
-    participationCategory: data.participationCategory,
-    parliamentTrack: data.parliamentTrack,
-    priorExperience: data.priorExperience,
-    accessCode: data.accessCode,
+    participationCategory: data.participationCategory || '',
+    parliamentTrack: data.parliamentTrack || '',
+    priorExperience: data.priorExperience || '',
+    accessCode: data.accessCode || '',
     ticketTier: data.ticketTier,
-    tierName: data.tierName,
+    tierName: data.tierName || '',
     quantity: data.quantity || 1,
     seats: data.seats || [],
-    foodAddon: data.foodAddon,
+    foodAddon: data.foodAddon || '',
     amountPaid: data.amountPaid || 0,
     status: 'confirmed',
     source: data.source || 'vercel',
@@ -172,17 +188,18 @@ export async function registerParticipant(data: {
   saveLocalCache([provisionalRecord, ...currentCache]);
 
   const specificCollection = getCollectionNameForType(data.type);
+  const cleanedFirestorePayload = cleanForFirestore(newRecord);
 
   try {
     // 1. Add to the distinct collection (e.g. 'delegates' or 'tickets')
-    const specificDocRef = await addDoc(collection(db, specificCollection), newRecord);
+    const specificDocRef = await addDoc(collection(db, specificCollection), cleanedFirestorePayload);
     const finalId = specificDocRef.id;
 
-    // 2. Also save to the master 'registrations' collection using the exact same ID
+    // 2. Also save to master 'registrations' collection using the exact same document ID
     try {
-      await setDoc(doc(db, COLLECTION_MASTER, finalId), newRecord);
+      await setDoc(doc(db, COLLECTION_MASTER, finalId), cleanedFirestorePayload);
     } catch (mirrorErr) {
-      console.warn('Master mirror write notification:', mirrorErr);
+      console.warn('Master mirror write notice:', mirrorErr);
     }
 
     const finalRecord: RegistrationRecord = {
@@ -193,7 +210,7 @@ export async function registerParticipant(data: {
     saveLocalCache([finalRecord, ...updatedCache]);
     return finalRecord;
   } catch (err) {
-    console.warn('Firestore write fallback triggered, saved in local cache:', err);
+    console.error('Firestore registration save notice:', err);
     return provisionalRecord;
   }
 }
@@ -250,16 +267,18 @@ export async function registerTroupe(data: {
   const currentCache = getLocalCache();
   saveLocalCache([provisionalRecord, ...currentCache]);
 
+  const cleanedFirestorePayload = cleanForFirestore(newRecord);
+
   try {
     // 1. Add to distinct 'troupes' collection
-    const troupeDoc = await addDoc(collection(db, COLLECTION_TROUPES), newRecord);
+    const troupeDoc = await addDoc(collection(db, COLLECTION_TROUPES), cleanedFirestorePayload);
     const finalId = troupeDoc.id;
 
     // 2. Mirror into master 'registrations'
     try {
-      await setDoc(doc(db, COLLECTION_MASTER, finalId), newRecord);
+      await setDoc(doc(db, COLLECTION_MASTER, finalId), cleanedFirestorePayload);
     } catch (mErr) {
-      console.warn('Troupe mirror notification:', mErr);
+      console.warn('Troupe mirror notice:', mErr);
     }
 
     const finalRecord: RegistrationRecord = { id: finalId, ...newRecord };
@@ -267,7 +286,7 @@ export async function registerTroupe(data: {
     saveLocalCache([finalRecord, ...updatedCache]);
     return finalRecord;
   } catch (err) {
-    console.warn('Troupe write fallback triggered:', err);
+    console.error('Troupe save notice:', err);
     return provisionalRecord;
   }
 }
@@ -315,16 +334,18 @@ export async function registerSecretariat(data: {
   const currentCache = getLocalCache();
   saveLocalCache([provisionalRecord, ...currentCache]);
 
+  const cleanedFirestorePayload = cleanForFirestore(newRecord);
+
   try {
     // 1. Add to distinct 'secretariat' collection
-    const secDoc = await addDoc(collection(db, COLLECTION_SECRETARIAT), newRecord);
+    const secDoc = await addDoc(collection(db, COLLECTION_SECRETARIAT), cleanedFirestorePayload);
     const finalId = secDoc.id;
 
     // 2. Mirror into master 'registrations'
     try {
-      await setDoc(doc(db, COLLECTION_MASTER, finalId), newRecord);
+      await setDoc(doc(db, COLLECTION_MASTER, finalId), cleanedFirestorePayload);
     } catch (mErr) {
-      console.warn('Secretariat mirror notification:', mErr);
+      console.warn('Secretariat mirror notice:', mErr);
     }
 
     const finalRecord: RegistrationRecord = { id: finalId, ...newRecord };
@@ -332,7 +353,7 @@ export async function registerSecretariat(data: {
     saveLocalCache([finalRecord, ...updatedCache]);
     return finalRecord;
   } catch (err) {
-    console.warn('Secretariat write fallback triggered:', err);
+    console.error('Secretariat save notice:', err);
     return provisionalRecord;
   }
 }
@@ -378,16 +399,18 @@ export async function registerSponsor(data: {
   const currentCache = getLocalCache();
   saveLocalCache([provisionalRecord, ...currentCache]);
 
+  const cleanedFirestorePayload = cleanForFirestore(newRecord);
+
   try {
     // 1. Add to distinct 'sponsors' collection
-    const spnDoc = await addDoc(collection(db, COLLECTION_SPONSORS), newRecord);
+    const spnDoc = await addDoc(collection(db, COLLECTION_SPONSORS), cleanedFirestorePayload);
     const finalId = spnDoc.id;
 
     // 2. Mirror into master 'registrations'
     try {
-      await setDoc(doc(db, COLLECTION_MASTER, finalId), newRecord);
+      await setDoc(doc(db, COLLECTION_MASTER, finalId), cleanedFirestorePayload);
     } catch (mErr) {
-      console.warn('Sponsor mirror notification:', mErr);
+      console.warn('Sponsor mirror notice:', mErr);
     }
 
     const finalRecord: RegistrationRecord = { id: finalId, ...newRecord };
@@ -395,7 +418,7 @@ export async function registerSponsor(data: {
     saveLocalCache([finalRecord, ...updatedCache]);
     return finalRecord;
   } catch (err) {
-    console.warn('Sponsor write fallback triggered:', err);
+    console.error('Sponsor save notice:', err);
     return provisionalRecord;
   }
 }
@@ -437,16 +460,18 @@ export async function registerInquiry(data: {
   const currentCache = getLocalCache();
   saveLocalCache([provisionalRecord, ...currentCache]);
 
+  const cleanedFirestorePayload = cleanForFirestore(newRecord);
+
   try {
     // 1. Add to distinct 'inquiries' collection
-    const inqDoc = await addDoc(collection(db, COLLECTION_INQUIRIES), newRecord);
+    const inqDoc = await addDoc(collection(db, COLLECTION_INQUIRIES), cleanedFirestorePayload);
     const finalId = inqDoc.id;
 
     // 2. Mirror into master 'registrations'
     try {
-      await setDoc(doc(db, COLLECTION_MASTER, finalId), newRecord);
+      await setDoc(doc(db, COLLECTION_MASTER, finalId), cleanedFirestorePayload);
     } catch (mErr) {
-      console.warn('Inquiry mirror notification:', mErr);
+      console.warn('Inquiry mirror notice:', mErr);
     }
 
     const finalRecord: RegistrationRecord = { id: finalId, ...newRecord };
@@ -454,14 +479,14 @@ export async function registerInquiry(data: {
     saveLocalCache([finalRecord, ...updatedCache]);
     return finalRecord;
   } catch (err) {
-    console.warn('Inquiry write fallback triggered:', err);
+    console.error('Inquiry save notice:', err);
     return provisionalRecord;
   }
 }
 
 /**
  * Real-time listener for the Admin Portal & Registry.
- * Subscribes to the master 'registrations' collection, and also polls distinct collections
+ * Subscribes to the master 'registrations' collection, and also subscribes to distinct collections
  * to ensure ANY entry created in 'tickets', 'delegates', 'troupes', 'secretariat', 'sponsors', 'inquiries'
  * is immediately visible with zero latency.
  */
@@ -475,52 +500,39 @@ export function subscribeToRegistrations(
     onData(cached);
   }
 
-  let masterRecords: RegistrationRecord[] = [];
-  const individualRecordsMap = new Map<string, RegistrationRecord>();
+  const allRecordsMap = new Map<string, RegistrationRecord>();
 
   const emitCombined = () => {
-    const combinedMap = new Map<string, RegistrationRecord>();
-    
-    // 1. Add master records
-    for (const r of masterRecords) {
-      if (!isMockRecord(r)) {
-        combinedMap.set(r.id, r);
-        if (r.uniqueCode) combinedMap.set(r.uniqueCode, r);
-      }
-    }
-
-    // 2. Add any individual collection records that might have been added directly
-    for (const [, r] of individualRecordsMap.entries()) {
-      if (!isMockRecord(r)) {
-        if (!combinedMap.has(r.id) && !combinedMap.has(r.uniqueCode)) {
-          combinedMap.set(r.id, r);
-        }
-      }
-    }
-
-    // Convert to array and deduplicate
-    const finalArray = Array.from(new Set(combinedMap.values()));
-    finalArray.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-
-    saveLocalCache(finalArray);
-    onData(finalArray);
+    const list = Array.from(allRecordsMap.values()).filter(r => !isMockRecord(r));
+    list.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+    saveLocalCache(list);
+    onData(list);
   };
 
-  try {
-    const qMaster = query(collection(db, COLLECTION_MASTER), orderBy('createdAt', 'desc'), limit(500));
-    
-    const unsubMaster = onSnapshot(
-      qMaster,
-      (snapshot) => {
-        masterRecords = [];
-        snapshot.forEach((docSnap) => {
-          const d = docSnap.data() as Omit<RegistrationRecord, 'id'>;
-          const rec: RegistrationRecord = {
-            id: docSnap.id,
-            ...d
-          };
-          if (!isMockRecord(rec)) {
-            let cat: RegistrationRecord['_category'] = d._category;
+  const collectionsToListen: {
+    name: string;
+    defaultType: RegistrationType;
+    defaultCat: RegistrationRecord['_category'];
+  }[] = [
+    { name: COLLECTION_MASTER, defaultType: 'delegate', defaultCat: 'delegates' },
+    { name: COLLECTION_DELEGATES, defaultType: 'delegate', defaultCat: 'delegates' },
+    { name: COLLECTION_TICKETS, defaultType: 'ticket', defaultCat: 'tickets' },
+    { name: COLLECTION_TROUPES, defaultType: 'troupe', defaultCat: 'plays' },
+    { name: COLLECTION_SECRETARIAT, defaultType: 'secretariat', defaultCat: 'secretariat' },
+    { name: COLLECTION_SPONSORS, defaultType: 'sponsor', defaultCat: 'sponsors' },
+    { name: COLLECTION_INQUIRIES, defaultType: 'inquiry', defaultCat: 'inquiries' },
+  ];
+
+  const unsubscribers: (() => void)[] = [];
+
+  for (const colInfo of collectionsToListen) {
+    try {
+      const unsub = onSnapshot(
+        collection(db, colInfo.name),
+        (snap) => {
+          snap.forEach((docSnap) => {
+            const d = docSnap.data() as Omit<RegistrationRecord, 'id'>;
+            let cat: RegistrationRecord['_category'] = d._category || colInfo.defaultCat;
             if (!cat) {
               if (d.type === 'ticket') cat = 'tickets';
               else if (d.type === 'troupe') cat = 'plays';
@@ -529,55 +541,41 @@ export function subscribeToRegistrations(
               else if (d.type === 'inquiry') cat = 'inquiries';
               else cat = 'delegates';
             }
-            rec._category = cat;
-            masterRecords.push(rec);
-          }
-        });
-        emitCombined();
-      },
-      (error) => {
-        console.warn('Real-time master query notice:', error);
-        if (onError) onError(error);
-      }
-    );
 
-    // Also listen to distinct 'tickets' and 'delegates' collections
-    const unsubTickets = onSnapshot(
-      collection(db, COLLECTION_TICKETS),
-      (snap) => {
-        snap.forEach(docSnap => {
-          const d = docSnap.data() as Omit<RegistrationRecord, 'id'>;
-          const rec: RegistrationRecord = { ...d, id: docSnap.id, type: d.type || 'ticket', _category: 'tickets' };
-          if (!isMockRecord(rec)) individualRecordsMap.set(docSnap.id, rec);
-        });
-        emitCombined();
-      },
-      () => {}
-    );
+            const rec: RegistrationRecord = {
+              ...d,
+              id: docSnap.id,
+              type: d.type || colInfo.defaultType,
+              _category: cat,
+            };
 
-    const unsubDelegates = onSnapshot(
-      collection(db, COLLECTION_DELEGATES),
-      (snap) => {
-        snap.forEach(docSnap => {
-          const d = docSnap.data() as Omit<RegistrationRecord, 'id'>;
-          const rec: RegistrationRecord = { ...d, id: docSnap.id, type: d.type || 'delegate', _category: 'delegates' };
-          if (!isMockRecord(rec)) individualRecordsMap.set(docSnap.id, rec);
-        });
-        emitCombined();
-      },
-      () => {}
-    );
-
-    return () => {
-      unsubMaster();
-      unsubTickets();
-      unsubDelegates();
-    };
-  } catch (err) {
-    console.error('Failed to bind snapshot listener:', err);
-    onData(getLocalCache());
-    return () => {};
+            if (!isMockRecord(rec)) {
+              // Prefer document by ID
+              allRecordsMap.set(rec.id, rec);
+            }
+          });
+          emitCombined();
+        },
+        (err) => {
+          console.warn(`Snapshot notice for ${colInfo.name}:`, err);
+          if (onError && colInfo.name === COLLECTION_MASTER) onError(err);
+        }
+      );
+      unsubscribers.push(unsub);
+    } catch (err) {
+      console.warn(`Failed to listen to ${colInfo.name}:`, err);
+    }
   }
+
+  return () => {
+    unsubscribers.forEach(unsub => {
+      try {
+        unsub();
+      } catch {
+        // ignore
+      }
+    });
+  };
 }
 
 /**
@@ -588,27 +586,33 @@ export async function updateParticipantStatus(
   status: RegistrationRecord['status'],
   type?: RegistrationType
 ): Promise<void> {
-  const updates: Partial<RegistrationRecord> = {
+  const updates: Record<string, any> = {
     status,
-    checkedInAt: status === 'checked-in' ? new Date().toISOString() : undefined,
   };
+  if (status === 'checked-in') {
+    updates.checkedInAt = new Date().toISOString();
+  }
 
   const cached = getLocalCache().map(item => item.id === id ? { ...item, ...updates } : item);
   saveLocalCache(cached);
 
   if (!id.startsWith('temp_')) {
     try {
+      const cleanedUpdates = cleanForFirestore(updates);
       // 1. Update in master
-      await updateDoc(doc(db, COLLECTION_MASTER, id), updates).catch(() => {});
+      await updateDoc(doc(db, COLLECTION_MASTER, id), cleanedUpdates).catch(() => {});
       
       // 2. Update in specific collection if type is known
       if (type) {
         const specCol = getCollectionNameForType(type);
-        await updateDoc(doc(db, specCol, id), updates).catch(() => {});
+        await updateDoc(doc(db, specCol, id), cleanedUpdates).catch(() => {});
       } else {
-        // Try both delegates and tickets
-        await updateDoc(doc(db, COLLECTION_DELEGATES, id), updates).catch(() => {});
-        await updateDoc(doc(db, COLLECTION_TICKETS, id), updates).catch(() => {});
+        await updateDoc(doc(db, COLLECTION_DELEGATES, id), cleanedUpdates).catch(() => {});
+        await updateDoc(doc(db, COLLECTION_TICKETS, id), cleanedUpdates).catch(() => {});
+        await updateDoc(doc(db, COLLECTION_TROUPES, id), cleanedUpdates).catch(() => {});
+        await updateDoc(doc(db, COLLECTION_SECRETARIAT, id), cleanedUpdates).catch(() => {});
+        await updateDoc(doc(db, COLLECTION_SPONSORS, id), cleanedUpdates).catch(() => {});
+        await updateDoc(doc(db, COLLECTION_INQUIRIES, id), cleanedUpdates).catch(() => {});
       }
     } catch (err) {
       console.error('Error updating status in Firebase:', err);
@@ -659,7 +663,7 @@ export async function purgeAllMockData(): Promise<{ count: number; message: stri
     await deleteDoc(doc(db, COLLECTION_MASTER, 'cultrahus_lead_01')).catch(() => {});
     await deleteDoc(doc(db, COLLECTION_DELEGATES, 'cultrahus_lead_01')).catch(() => {});
 
-    // 3. Scan for any records with source 'gemini_app' or seed unique code
+    // 3. Scan for any records with seed unique code
     const qSeed = query(collection(db, COLLECTION_MASTER), where('uniqueCode', '==', 'SNGM-DEL-8801A'));
     const snapSeed = await getDocs(qSeed);
     snapSeed.forEach(async (d) => {
@@ -761,21 +765,19 @@ export function calculateStats(records: RegistrationRecord[]): RegistrationStats
     if (isMockRecord(r)) continue;
 
     const cat = r._category || (r.type === 'ticket' ? 'tickets' : r.type === 'troupe' ? 'plays' : r.type === 'secretariat' ? 'secretariat' : r.type === 'sponsor' ? 'sponsors' : r.type === 'inquiry' ? 'inquiries' : 'delegates');
-    if (cat === 'delegates') delegates++;
-    else if (cat === 'tickets') tickets++;
+    if (cat === 'tickets') tickets++;
     else if (cat === 'plays') plays++;
     else if (cat === 'secretariat') secretariat++;
     else if (cat === 'sponsors') sponsors++;
     else if (cat === 'inquiries') inquiries++;
+    else delegates++;
 
     if (r.status === 'checked-in') checkedIn++;
-    if (r.amountPaid) totalRevenue += r.amountPaid;
+    if (typeof r.amountPaid === 'number') totalRevenue += r.amountPaid;
   }
 
-  const validCount = records.filter(r => !isMockRecord(r)).length;
-
   return {
-    total: validCount,
+    total: records.filter(r => !isMockRecord(r)).length,
     delegates,
     tickets,
     plays,
