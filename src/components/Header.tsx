@@ -71,31 +71,31 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
 
       {/* Main Navigation Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between min-h-[4.75rem] py-2.5 gap-3">
           {/* Logo & Title */}
           <button
             id="brand-logo-btn"
             onClick={() => handleNav('home')}
-            className="flex items-center gap-3 text-left group focus:outline-none"
+            className="flex items-center gap-2.5 sm:gap-3 text-left group focus:outline-none shrink-0"
           >
             <CultrahusLogo size="sm" />
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-serif text-lg sm:text-xl font-bold tracking-wide text-[#242c18] group-hover:text-[#4a5e33] transition-colors">
+            <div className="flex flex-col justify-center min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="font-serif text-base sm:text-lg md:text-xl font-bold tracking-wide text-[#242c18] group-hover:text-[#4a5e33] transition-colors whitespace-nowrap">
                   Cultrahus Sangam
                 </span>
-                <span className="text-[11px] px-1.5 py-0.5 rounded bg-[#ebf0e2] text-[#344222] font-semibold border border-[#c3d3b4]">
+                <span className="text-[10px] sm:text-[11px] px-1.5 py-0.5 rounded bg-[#ebf0e2] text-[#344222] font-semibold border border-[#c3d3b4] whitespace-nowrap">
                   2026
                 </span>
               </div>
-              <p className="text-[11px] text-[#556345] tracking-wider uppercase font-medium hidden sm:block">
+              <p className="text-[9.5px] sm:text-[10px] md:text-[11px] text-[#556345] tracking-wider uppercase font-medium whitespace-nowrap overflow-hidden text-ellipsis">
                 National Theatre Conclave &amp; Cultural Parliament
               </p>
             </div>
           </button>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center space-x-1">
+          <nav className="hidden lg:flex items-center space-x-0.5 xl:space-x-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -104,13 +104,13 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
                   key={item.id}
                   id={`nav-link-${item.id}`}
                   onClick={() => handleNav(item.id)}
-                  className={`relative px-3 py-2 rounded-md text-xs font-semibold tracking-wide transition-all duration-150 flex items-center gap-1.5 ${
+                  className={`relative px-2 py-1.5 xl:px-3 xl:py-2 rounded-md text-[11px] xl:text-xs font-semibold tracking-wide transition-all duration-150 flex items-center gap-1 xl:gap-1.5 whitespace-nowrap ${
                     isActive
                       ? 'bg-[#3b4928] text-[#f7f4ec] shadow-sm'
                       : 'text-[#384626] hover:text-[#192111] hover:bg-[#eae1cd]'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#e5d4aa]' : 'text-[#5d7143]'}`} />
+                  <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-[#e5d4aa]' : 'text-[#5d7143]'}`} />
                   <span>{item.label}</span>
                   {item.badge && (
                     <span
@@ -129,11 +129,11 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
           </nav>
 
           {/* Desktop Action Buttons */}
-          <div className="hidden sm:flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-2 shrink-0">
             <button
               id="header-admin-btn"
               onClick={() => handleNav('admin')}
-              className={`px-3 py-2 rounded-md text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs border ${
+              className={`px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs border ${
                 activeTab === 'admin'
                   ? 'bg-[#3b4928] text-[#f7f4ec] border-[#242c18]'
                   : 'bg-[#ede4d2] hover:bg-[#e1d5bd] text-[#242c18] border-[#c7bca5]'
@@ -142,24 +142,6 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
             >
               <ShieldCheck className={`w-3.5 h-3.5 ${activeTab === 'admin' ? 'text-[#e5d4aa]' : 'text-[#3b4928]'}`} />
               <span>Admin Portal</span>
-            </button>
-
-            <button
-              id="header-accreditation-btn"
-              onClick={() => handleNav('delegate')}
-              className="px-3.5 py-2 rounded-md text-xs font-bold bg-[#ede4d2] hover:bg-[#e3d7bf] text-[#28351b] border border-[#c7bca5] transition-colors flex items-center gap-1.5"
-            >
-              <Award className="w-3.5 h-3.5 text-[#4a5e33]" />
-              <span>Accreditation</span>
-            </button>
-
-            <button
-              id="header-book-pass-btn"
-              onClick={() => handleNav('tickets')}
-              className="px-4 py-2 rounded-md text-xs font-bold bg-[#3b4928] hover:bg-[#485932] text-[#f7f4ec] font-sans shadow-md transition-all transform hover:-translate-y-0.5 flex items-center gap-1.5"
-            >
-              <Ticket className="w-3.5 h-3.5 text-[#e5d4aa]" />
-              <span>Book Pass</span>
             </button>
           </div>
 
@@ -208,24 +190,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
             );
           })}
 
-          <div className="pt-4 grid grid-cols-2 gap-2">
-            <button
-              id="mobile-nav-delegate-btn"
-              onClick={() => handleNav('delegate')}
-              className="w-full py-2.5 rounded-md text-xs font-bold bg-[#ede4d2] text-[#28351b] border border-[#c7bca5] text-center"
-            >
-              Delegate Pass ₹650
-            </button>
-            <button
-              id="mobile-nav-tickets-btn"
-              onClick={() => handleNav('tickets')}
-              className="w-full py-2.5 rounded-md text-xs font-bold bg-[#3b4928] hover:bg-[#485932] text-[#f7f4ec] text-center shadow"
-            >
-              Book Passes
-            </button>
-          </div>
-
-          <div className="pt-2">
+          <div className="pt-3">
             <button
               id="mobile-nav-admin-btn"
               onClick={() => handleNav('admin')}
