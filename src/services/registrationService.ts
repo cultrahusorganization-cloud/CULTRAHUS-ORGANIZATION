@@ -833,7 +833,7 @@ export async function ensureInitialCollectionsAndData(): Promise<{ success: bool
       lastSyncedAt: new Date().toISOString(),
     }, { merge: true });
 
-    // 2. Official event configuration with updated venue: Bhiwadi (Venue: TBA)
+    // 2. Official event configuration with updated venue: Vedanta Farms, Bhiwadi
     const eventSettingsRef = doc(db, 'event_settings', 'cultrahus_config');
     await setDoc(eventSettingsRef, {
       eventName: 'Cultrahus Sangam 2026',
@@ -841,7 +841,7 @@ export async function ensureInitialCollectionsAndData(): Promise<{ success: bool
       organization: 'Cultrahus Organization',
       organizerEmail: 'cultrahusorganization@gmail.com',
       date: 'Sunday, 18 October 2026',
-      venue: 'TBA (Auditorium Complex, Bhiwadi)',
+      venue: 'Vedanta Farms, Bhiwadi',
       city: 'Bhiwadi',
       state: 'Rajasthan',
       region: 'NCR',
@@ -864,7 +864,7 @@ export async function ensureInitialCollectionsAndData(): Promise<{ success: bool
 
     return {
       success: true,
-      message: 'Firestore distinct collections (delegates, tickets, troupes, secretariat, sponsors, inquiries) active with venue set to Bhiwadi (Venue: TBA) and clean database!'
+      message: 'Firestore distinct collections (delegates, tickets, troupes, secretariat, sponsors, inquiries) active with venue set to Vedanta Farms, Bhiwadi and clean database!'
     };
   } catch (error) {
     console.warn('Initial collections check notice:', error);

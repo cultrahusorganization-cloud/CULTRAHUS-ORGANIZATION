@@ -413,7 +413,7 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
               </span>
               <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#1b2212] text-[#c8d4bb] text-xs font-medium border border-[#3e4a2b]">
                 <MapPin className="w-3 h-3 text-[#c4a159]" />
-                <span>Event: Bhiwadi (Venue: TBA)</span>
+                <span>Event: Vedanta Farms, Bhiwadi</span>
               </span>
             </div>
             <h1 className="font-serif text-2xl sm:text-4xl font-extrabold text-white">

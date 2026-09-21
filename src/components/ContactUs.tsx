@@ -175,8 +175,8 @@ export const ContactUs: React.FC = () => {
                   <MapPin className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="font-bold text-[#242c18] block">Conclave City</span>
-                  <span className="text-[#556345]">Bhiwadi, India (Venue: TBA)</span>
+                  <span className="font-bold text-[#242c18] block">Conclave Venue</span>
+                  <span className="text-[#556345]">Vedanta Farms, Bhiwadi, Rajasthan (NCR), India</span>
                 </div>
               </div>
 

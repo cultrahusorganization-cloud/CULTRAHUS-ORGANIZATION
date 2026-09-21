@@ -91,7 +91,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
     { 
       id: 'about', 
       label: 'About & Venue', 
-      desc: 'Bhiwadi NCR facility, auditorium directions & heritage',
+      desc: 'Vedanta Farms, Bhiwadi facility, stages, gates & heritage',
       icon: MapPin 
     },
     { 
@@ -119,7 +119,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2 mx-auto sm:mx-0">
             <Calendar className="w-3 h-3 text-[#788e55]" />
-            <span>Sunday, 18 October 2026 • Bhiwadi (NCR) • Official Conclave Portal</span>
+            <span>Sunday, 18 October 2026 • Vedanta Farms, Bhiwadi • Official Conclave Portal</span>
           </div>
           <button
             id="top-organizer-registry-btn"
@@ -341,7 +341,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
             <div className="p-4 bg-[#ede4d2] border-t border-[#dfd7c3] shrink-0 flex items-center justify-between text-xs text-[#556345]">
               <div className="flex items-center gap-1.5 font-medium">
                 <Calendar className="w-3.5 h-3.5 text-[#5b6e41]" />
-                <span>18 Oct 2026 • Bhiwadi (NCR)</span>
+                <span>18 Oct 2026 • Vedanta Farms, Bhiwadi</span>
               </div>
               <button
                 onClick={() => setDashboardOpen(false)}

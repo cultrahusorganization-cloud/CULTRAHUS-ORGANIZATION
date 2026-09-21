@@ -94,7 +94,7 @@ export const Overview: React.FC<OverviewProps> = ({ setActiveTab }) => {
                 </div>
                 <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/90 backdrop-blur-sm border border-[#cfc4ad] shadow-sm">
                   <MapPin className="w-4 h-4 text-[#4b5d36]" />
-                  <span className="font-semibold text-[#242c18]">Venue: TBA</span>
+                  <span className="font-semibold text-[#242c18]">Vedanta Farms, Bhiwadi</span>
                 </div>
               </div>
 

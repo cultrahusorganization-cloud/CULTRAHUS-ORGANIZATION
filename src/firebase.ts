@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
+import { initializeFirestore, getFirestore, doc, getDoc } from 'firebase/firestore';
 import bundledConfig from '../firebase-applet-config.json';
 
 // Universal Firebase Configuration with Triple-Redundancy (Env Vars -> Bundled JSON -> Static Fallback)
@@ -28,29 +28,31 @@ const firebaseConfig = {
 // Initialize Firebase App
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-// CRITICAL: Connect to the specific database instance
-export const db = firebaseConfig.firestoreDatabaseId && firebaseConfig.firestoreDatabaseId !== '(default)'
-  ? getFirestore(app, firebaseConfig.firestoreDatabaseId)
-  : getFirestore(app);
+// Connect to the specific database instance with resilient long polling fallback
+export const db = (() => {
+  const databaseId = firebaseConfig.firestoreDatabaseId && firebaseConfig.firestoreDatabaseId !== '(default)'
+    ? firebaseConfig.firestoreDatabaseId
+    : undefined;
+
+  try {
+    return initializeFirestore(app, {
+      experimentalAutoDetectLongPolling: true,
+    }, databaseId);
+  } catch {
+    return databaseId ? getFirestore(app, databaseId) : getFirestore(app);
+  }
+})();
 
 export const auth = getAuth(app);
 
-// Connection test helper
+// Soft connection test helper (non-throwing, respects cache and offline state)
 export async function testConnection(): Promise<boolean> {
   try {
-    await getDocFromServer(doc(db, 'test', 'connection'));
+    await getDoc(doc(db, 'event_settings', 'cultrahus_config'));
     return true;
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.warn('Firebase client is offline or starting up:', error.message);
-    }
+  } catch {
     return false;
   }
 }
-
-// Non-blocking connection test
-testConnection().catch((err) => {
-  console.warn('Connection check handled:', err);
-});
 
 export { app, firebaseConfig };

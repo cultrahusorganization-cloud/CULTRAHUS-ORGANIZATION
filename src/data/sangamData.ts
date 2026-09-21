@@ -108,7 +108,7 @@ export const FESTIVAL_FAQS: FAQItem[] = [
     id: "faq-4",
     category: "Venue",
     question: "Where is Cultrahus Sangam 2026 taking place, and how do I reach it?",
-    answer: "Venue: TBA (Bhiwadi). The central festival secretariat is finalizing the premier auditorium complex in Bhiwadi to accommodate 1,200+ delegates and proscenium stages. All confirmed delegates, collegiate troupes, and ticket holders will receive exact location coordinates, entry gates, and transit guidelines directly via WhatsApp and registered Email."
+    answer: "Venue: Vedanta Farms, Bhiwadi. Cultrahus Sangam 2026 will be hosted at Vedanta Farms, Bhiwadi to accommodate 1,200+ delegates, proscenium theatre stages, and cultural pavilions. All confirmed delegates, collegiate troupes, and ticket holders receive exact location coordinates, gate access passes, and transit guidelines via WhatsApp and registered Email."
   },
   {
     id: "faq-5",
