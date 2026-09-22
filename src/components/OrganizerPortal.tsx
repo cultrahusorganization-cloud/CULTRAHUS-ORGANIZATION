@@ -80,7 +80,8 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
-    if (passwordInput.trim() === 'adminisvansh') {
+    const input = passwordInput.trim();
+    if (input === 'cultrahus11!!2026' || input === 'cultrahus11!!2026:') {
       try {
         sessionStorage.setItem('cultrahus_admin_auth', 'true');
       } catch {

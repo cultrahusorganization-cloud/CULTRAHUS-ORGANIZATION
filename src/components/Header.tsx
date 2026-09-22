@@ -168,7 +168,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
             <button
               id="header-admin-portal-btn"
               onClick={() => handleNav('admin')}
-              title="Admin Portal - Registered Attendees Registry (Password: adminisvansh)"
+              title="Admin Portal - Registered Attendees Registry (Password: cultrahus11!!2026)"
               className={`px-3 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 sm:gap-2 shadow-xs border cursor-pointer ${
                 activeTab === 'admin'
                   ? 'bg-[#242c18] text-[#e5d4aa] border-[#181f10] shadow-sm ring-2 ring-[#c4a159]/40'
