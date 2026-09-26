@@ -29,7 +29,7 @@ export const DigitalPassModal: React.FC<DigitalPassModalProps> = ({ passData, on
       type: passData.type,
       event: 'Cultrahus Sangam 2026',
       date: '18 October 2026',
-      venue: 'Vedanta Farms, Bhiwadi',
+      venue: 'TBA',
       status: passData.status || 'Verified',
       issuedAt: passData.issuedIst || new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
     });
@@ -188,7 +188,7 @@ export const DigitalPassModal: React.FC<DigitalPassModalProps> = ({ passData, on
                   </div>
                   <div className="flex items-center gap-1">
                     <MapPin className="w-3.5 h-3.5 text-[#5b6e41]" />
-                    <span>Vedanta Farms, Bhiwadi</span>
+                    <span>Venue: TBA</span>
                   </div>
                 </div>
               </div>

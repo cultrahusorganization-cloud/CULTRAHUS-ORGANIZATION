@@ -70,7 +70,7 @@ export const SponsorUs: React.FC<SponsorUsProps> = ({ onPassGenerated }) => {
         contactPerson: formData.contactPerson.trim(),
         email: formData.email.trim(),
         whatsappPhone: formData.whatsappPhone,
-        cityState: formData.cityState.trim() || 'Bhiwadi',
+        cityState: formData.cityState.trim() || 'NCR',
         sponsorTier: selectedTier,
         proposalNotes: formData.proposalNotes.trim(),
         amount: activeTierObj.amount,
@@ -135,7 +135,7 @@ export const SponsorUs: React.FC<SponsorUsProps> = ({ onPassGenerated }) => {
           Sponsor Sangam 2026
         </h1>
         <p className="mt-3 text-[#556345] text-sm sm:text-base">
-          Position your brand at the premier cultural gathering of 1,200+ delegates, collegiate theatre society leaders, and distinguished dignitaries in Bhiwadi.
+          Position your brand at the premier cultural gathering of 1,200+ delegates, collegiate theatre society leaders, and distinguished dignitaries (Venue TBA).
         </p>
       </div>
 

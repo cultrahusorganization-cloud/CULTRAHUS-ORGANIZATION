@@ -183,7 +183,7 @@ export async function registerParticipant(data: {
     phone: data.phone?.trim() || '',
     organization: data.organization?.trim() || '',
     designation: data.designation?.trim() || '',
-    cityState: data.cityState?.trim() || 'Bhiwadi',
+    cityState: data.cityState?.trim() || 'NCR',
     type: data.type,
     participationCategory: data.participationCategory || '',
     parliamentTrack: data.parliamentTrack || '',
@@ -265,7 +265,7 @@ export async function registerTroupe(data: {
     phone: data.whatsappPhone.trim(),
     organization: data.troupeName.trim(),
     designation: 'Troupe Director',
-    cityState: 'Bhiwadi',
+    cityState: 'NCR',
     type: 'troupe',
     troupeName: data.troupeName.trim(),
     playTitle: data.playTitle.trim(),
@@ -339,7 +339,7 @@ export async function registerSecretariat(data: {
     phone: data.whatsappPhone.trim(),
     organization: 'Cultrahus Secretariat Applicant',
     designation: `Candidate (${data.department})`,
-    cityState: 'Bhiwadi',
+    cityState: 'NCR',
     type: 'secretariat',
     department: data.department,
     priorExperience: data.previousExperience.trim(),
@@ -408,7 +408,7 @@ export async function registerSponsor(data: {
     phone: data.whatsappPhone.trim(),
     organization: data.brandName.trim(),
     brandName: data.brandName.trim(),
-    cityState: data.cityState.trim() || 'Bhiwadi',
+    cityState: data.cityState.trim() || 'NCR',
     designation: 'Brand Representative',
     type: 'sponsor',
     sponsorTier: data.sponsorTier,
@@ -471,7 +471,7 @@ export async function registerInquiry(data: {
     name: data.fullName.trim(),
     email: data.email.trim().toLowerCase(),
     phone: data.whatsappPhone?.trim() || '',
-    cityState: 'Bhiwadi',
+    cityState: 'NCR',
     type: 'inquiry',
     inquiryCategory: data.category,
     subject: data.subject?.trim() || '',
@@ -833,7 +833,7 @@ export async function ensureInitialCollectionsAndData(): Promise<{ success: bool
       lastSyncedAt: new Date().toISOString(),
     }, { merge: true });
 
-    // 2. Official event configuration with updated venue: Vedanta Farms, Bhiwadi
+    // 2. Official event configuration with updated venue: TBA
     const eventSettingsRef = doc(db, 'event_settings', 'cultrahus_config');
     await setDoc(eventSettingsRef, {
       eventName: 'Cultrahus Sangam 2026',
@@ -841,9 +841,9 @@ export async function ensureInitialCollectionsAndData(): Promise<{ success: bool
       organization: 'Cultrahus Organization',
       organizerEmail: 'cultrahusorganization@gmail.com',
       date: 'Sunday, 18 October 2026',
-      venue: 'Vedanta Farms, Bhiwadi',
-      city: 'Bhiwadi',
-      state: 'Rajasthan',
+      venue: 'TBA',
+      city: 'TBA',
+      state: 'TBA',
       region: 'NCR',
       databaseId: 'ai-studio-1959e55b-78c9-4673-be88-b7d93b87ba81',
       collections: {
@@ -864,7 +864,7 @@ export async function ensureInitialCollectionsAndData(): Promise<{ success: bool
 
     return {
       success: true,
-      message: 'Firestore distinct collections (delegates, tickets, troupes, secretariat, sponsors, inquiries) active with venue set to Vedanta Farms, Bhiwadi and clean database!'
+      message: 'Firestore distinct collections (delegates, tickets, troupes, secretariat, sponsors, inquiries) active with venue set to TBA and clean database!'
     };
   } catch (error) {
     console.warn('Initial collections check notice:', error);

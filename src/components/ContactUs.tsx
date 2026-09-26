@@ -176,7 +176,7 @@ export const ContactUs: React.FC = () => {
                 </div>
                 <div>
                   <span className="font-bold text-[#242c18] block">Conclave Venue</span>
-                  <span className="text-[#556345]">Vedanta Farms, Bhiwadi, Rajasthan (NCR), India</span>
+                  <span className="text-[#556345]">TBA (To Be Announced) • National Capital Region (NCR), India</span>
                 </div>
               </div>
 

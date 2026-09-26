@@ -63,7 +63,7 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
                   onClick={() => handleNav('tickets')}
                   className="hover:text-white hover:underline transition-colors"
                 >
-                  Book Auditorium Passes (From ₹200)
+                  Book Auditorium Passes (From ₹400)
                 </button>
               </li>
               <li>
@@ -141,7 +141,7 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
             <div className="space-y-2.5 text-xs text-[#c8d4bb]">
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-[#e5d4aa] shrink-0 mt-0.5" />
-                <span>Vedanta Farms, Bhiwadi, Rajasthan (NCR), India</span>
+                <span>Venue: TBA (To Be Announced) • NCR, India</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-[#e5d4aa] shrink-0" />

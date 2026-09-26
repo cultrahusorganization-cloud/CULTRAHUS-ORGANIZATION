@@ -330,7 +330,7 @@ export const DelegatePass: React.FC<DelegatePassProps> = ({ onPassGenerated }) =
                   id="delegate-city-input"
                   type="text"
                   required
-                  placeholder="e.g. Bhiwadi, Rajasthan"
+                  placeholder="e.g. New Delhi, Delhi"
                   value={formData.cityState}
                   onChange={handleCityChange}
                   className="w-full px-4 py-3 rounded-xl bg-white border border-[#cfc4ad] text-sm text-[#242c18] focus:outline-none focus:border-[#3b4928] focus:ring-1 focus:ring-[#3b4928]"

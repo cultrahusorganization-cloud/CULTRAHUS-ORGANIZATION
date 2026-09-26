@@ -154,14 +154,14 @@ export const AboutVenue: React.FC = () => {
           <div className="p-5 rounded-2xl bg-white border border-[#dfd7c3] space-y-2">
             <div className="flex items-center gap-2 text-xs font-bold text-[#242c18]">
               <Compass className="w-4 h-4 text-[#5b6e41]" />
-              <span>Conclave Venue: Vedanta Farms, Bhiwadi</span>
+              <span>Conclave Venue: TBA (To Be Announced)</span>
             </div>
             <p className="text-xs text-[#556345] leading-relaxed">
-              Cultrahus Sangam 2026 will be hosted at the expansive <strong>Vedanta Farms, Bhiwadi</strong>, featuring dedicated proscenium stages, open-air cultural amphitheatres, and delegate dining pavilions.
+              Cultrahus Sangam 2026 venue will be announced shortly (<strong>TBA</strong>). The venue is being curated with dedicated proscenium stages, open-air cultural amphitheatres, and delegate dining pavilions.
             </p>
             <div className="pt-1 flex items-center gap-2 text-[11px] text-[#4a5e33] font-medium">
-              <span className="px-2 py-0.5 rounded bg-[#ebf0e2] border border-[#c3d3b4]">Bhiwadi (NCR)</span>
-              <span>• Convenient access from Delhi/NCR &amp; Jaipur</span>
+              <span className="px-2 py-0.5 rounded bg-[#ebf0e2] border border-[#c3d3b4]">Venue: TBA</span>
+              <span>• Full location coordinates &amp; gate guidelines will be shared soon</span>
             </div>
           </div>
 
@@ -171,7 +171,7 @@ export const AboutVenue: React.FC = () => {
               <span>Security &amp; QR Wristband Check-in</span>
             </div>
             <p className="text-xs text-[#556345] leading-relaxed">
-              Upon arrival at the Vedanta Farms main entrance (Gate 1 for Delegates, Gate 2 for Audience), present your digital credential QR pass for fast scanning and receive your official access wristband.
+              Upon arrival at the conclave main entrance (Gate 1 for Delegates, Gate 2 for Audience), present your digital credential QR pass for fast scanning and receive your official access wristband.
             </p>
             <div className="pt-1 flex items-center gap-2 text-[11px] text-[#4a5e33] font-medium">
               <span className="px-2 py-0.5 rounded bg-[#ebf0e2] border border-[#c3d3b4]">RFID Wristbands</span>

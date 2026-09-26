@@ -414,7 +414,7 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
               </span>
               <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#1b2212] text-[#c8d4bb] text-xs font-medium border border-[#3e4a2b]">
                 <MapPin className="w-3 h-3 text-[#c4a159]" />
-                <span>Event: Vedanta Farms, Bhiwadi</span>
+                <span>Event Venue: TBA</span>
               </span>
             </div>
             <h1 className="font-serif text-2xl sm:text-4xl font-extrabold text-white">
@@ -812,7 +812,7 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
                   {selectedDossier.name}
                 </h2>
                 <div className="text-xs text-[#556345] mt-0.5">
-                  {selectedDossier.organization || selectedDossier.troupeName || selectedDossier.brandName || 'Independent Participant'} • {selectedDossier.cityState || 'Bhiwadi'}
+                  {selectedDossier.organization || selectedDossier.troupeName || selectedDossier.brandName || 'Independent Participant'} • {selectedDossier.cityState || 'National Capital Region'}
                 </div>
               </div>
 
@@ -883,7 +883,7 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
                 <div className="p-3 rounded-xl bg-white border border-[#dfd7c3] space-y-1">
                   <span className="font-bold text-[#556345] block text-[10px] uppercase">Institution &amp; Region</span>
                   <div className="font-medium text-[#242c18]">{selectedDossier.organization || 'Independent'}</div>
-                  <div className="text-[#556345]">{selectedDossier.cityState || 'Bhiwadi, Rajasthan (NCR)'}</div>
+                  <div className="text-[#556345]">{selectedDossier.cityState || 'National Capital Region (NCR)'}</div>
                   {selectedDossier.designation && (
                     <div className="text-[11px] text-[#242c18] italic mt-1">Designation: {selectedDossier.designation}</div>
                   )}

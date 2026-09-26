@@ -94,7 +94,7 @@ export const Overview: React.FC<OverviewProps> = ({ setActiveTab }) => {
                 </div>
                 <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/90 backdrop-blur-sm border border-[#cfc4ad] shadow-sm">
                   <MapPin className="w-4 h-4 text-[#4b5d36]" />
-                  <span className="font-semibold text-[#242c18]">Vedanta Farms, Bhiwadi</span>
+                  <span className="font-semibold text-[#242c18]">Venue: TBA</span>
                 </div>
               </div>
 
@@ -114,7 +114,7 @@ export const Overview: React.FC<OverviewProps> = ({ setActiveTab }) => {
                   className="px-6 py-3.5 rounded-xl text-sm font-bold bg-[#ede4d2] hover:bg-[#e2d6bf] text-[#242c18] border border-[#c5b9a1] transition-all flex items-center gap-2 shadow-sm"
                 >
                   <Ticket className="w-4 h-4 text-[#3b4928]" />
-                  <span>Book Passes (From ₹200)</span>
+                  <span>Book Passes (From ₹400)</span>
                 </button>
               </div>
             </div>
@@ -324,7 +324,7 @@ export const Overview: React.FC<OverviewProps> = ({ setActiveTab }) => {
                 onClick={() => handleNav('tickets')}
                 className="px-6 py-3 rounded-xl bg-[#3b4928] text-[#f7f4ec] font-bold text-xs hover:bg-[#485932] border border-[#5b6e41] transition"
               >
-                Book Passes (From ₹200)
+                Book Passes (From ₹400)
               </button>
               <button
                 id="bottom-admin-btn"

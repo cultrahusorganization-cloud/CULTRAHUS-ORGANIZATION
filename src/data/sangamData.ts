@@ -96,7 +96,7 @@ export const FESTIVAL_FAQS: FAQItem[] = [
     id: "faq-2",
     category: "Tickets",
     question: "How do Conclave Ticket passes differ between Classic, Royal, and VIP Sovereign?",
-    answer: "Classic (₹200, crossed from ₹350) offers general amphitheatre & auditorium entry with no food included. Royal (₹400, crossed from ₹600) includes reserved mid-tier auditorium seating and a high-tea refreshment box. VIP Sovereign (₹600, crossed from ₹1,050) guarantees front-row seating (Rows A-B), fast-track security access, and food included (complimentary royal banquet dining). IMPORTANT: Every pass tier includes complete unrestricted entry to both the Grand Garba Night / Dandiya Raas and the Celebrity DJ Night at zero extra charge!"
+    answer: "Classic (₹400, crossed from ₹600) offers general amphitheatre & auditorium entry with no food included. Royal (₹600, crossed from ₹900) includes reserved mid-tier auditorium seating and a high-tea refreshment box. VIP Sovereign (₹800, crossed from ₹1,200) guarantees front-row seating (Rows A-B), fast-track security access, and food included (complimentary royal banquet dining). IMPORTANT: Every pass tier includes complete unrestricted entry to both the Grand Garba Night / Dandiya Raas and the Celebrity DJ Night at zero extra charge!"
   },
   {
     id: "faq-3",
@@ -108,7 +108,7 @@ export const FESTIVAL_FAQS: FAQItem[] = [
     id: "faq-4",
     category: "Venue",
     question: "Where is Cultrahus Sangam 2026 taking place, and how do I reach it?",
-    answer: "Venue: Vedanta Farms, Bhiwadi. Cultrahus Sangam 2026 will be hosted at Vedanta Farms, Bhiwadi to accommodate 1,200+ delegates, proscenium theatre stages, and cultural pavilions. All confirmed delegates, collegiate troupes, and ticket holders receive exact location coordinates, gate access passes, and transit guidelines via WhatsApp and registered Email."
+    answer: "Venue: TBA (To Be Announced). The official venue for Cultrahus Sangam 2026 is currently being finalized and will be announced shortly (TBA) to accommodate 1,200+ delegates, proscenium theatre stages, and cultural pavilions. All confirmed delegates, collegiate troupes, and ticket holders will receive exact location coordinates, gate access passes, and transit guidelines via WhatsApp and registered Email as soon as announced."
   },
   {
     id: "faq-5",
@@ -151,8 +151,8 @@ export const TICKET_TIERS: TicketTier[] = [
   {
     id: 'classic',
     name: 'Classic Pass',
-    price: 200,
-    originalPrice: 350,
+    price: 400,
+    originalPrice: 600,
     description: 'General amphitheatre & auditorium entry pass for culture enthusiasts.',
     features: [
       'Access to open amphitheatre & general auditorium zone',
@@ -166,8 +166,8 @@ export const TICKET_TIERS: TicketTier[] = [
   {
     id: 'royal',
     name: 'Royal Pass',
-    price: 400,
-    originalPrice: 600,
+    price: 600,
+    originalPrice: 900,
     popular: true,
     badge: 'Best Value',
     description: 'Reserved mid-tier auditorium seating + high-tea refreshment box.',
@@ -184,8 +184,8 @@ export const TICKET_TIERS: TicketTier[] = [
   {
     id: 'sovereign',
     name: 'VIP Sovereign Pass',
-    price: 600,
-    originalPrice: 1050,
+    price: 800,
+    originalPrice: 1200,
     badge: 'Premium VIP',
     description: 'Front-row seating, fast-track access, and royal banquet dining included.',
     features: [
