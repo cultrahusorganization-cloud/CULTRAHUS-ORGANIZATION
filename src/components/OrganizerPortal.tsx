@@ -246,11 +246,12 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
     let detail2Value: string = record.status || 'Confirmed';
 
     if (cat === 'tickets') {
-      title = `${record.ticketTier?.toUpperCase() || 'CONCLAVE'} AUDITORIUM PASS`;
-      detail1Label = 'Tier & Seats';
-      detail1Value = `${record.ticketTier || 'Standard'} (${record.quantity || 1} seat${(record.quantity || 1) > 1 ? 's' : ''})`;
-      detail2Label = 'Food Hospitality';
-      detail2Value = record.foodAddon || 'General Food Court Access';
+      const isTwoDay = record.ticketTier === 'two_day' || record.tierName?.includes('2-Day');
+      title = record.tierName || (isTwoDay ? '2-DAY CONCLAVE PASS (BOTH DAYS)' : 'SINGLE-DAY PASS');
+      detail1Label = 'Pass Tier & Day';
+      detail1Value = `${record.selectedDay || (isTwoDay ? 'Both Days Included' : record.tierName || 'Standard')} (${record.quantity || 1} pass${(record.quantity || 1) > 1 ? 'es' : ''})`;
+      detail2Label = 'Inclusions';
+      detail2Value = record.foodAddon || (isTwoDay ? 'Both Days: Day 1 & Day 2 Full Access' : 'Single Day Access');
     } else if (cat === 'plays') {
       title = 'OFFICIAL DRAMA TROUPE ENTRY';
       detail1Label = 'Play & Troupe';
@@ -402,48 +403,48 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
 
   // When Authenticated, render the complete Admin Portal
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6 sm:space-y-8 w-full max-w-full overflow-hidden">
       {/* Top Banner */}
-      <div className="bg-[#242c18] border-2 border-[#52653a] rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#3b4928] text-[#e5d4aa] text-xs font-bold uppercase tracking-wider border border-[#52653a]">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Authenticated Secretariat Portal</span>
+      <div className="bg-[#242c18] border-2 border-[#52653a] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 text-white shadow-lg relative overflow-hidden">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+              <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-[#3b4928] text-[#e5d4aa] text-[10px] sm:text-xs font-bold uppercase tracking-wider border border-[#52653a]">
+                <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                <span>Secretariat Portal</span>
               </span>
-              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#1b2212] text-[#c8d4bb] text-xs font-medium border border-[#3e4a2b]">
-                <MapPin className="w-3 h-3 text-[#c4a159]" />
-                <span>Event Venue: TBA</span>
+              <span className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full bg-[#1b2212] text-[#c8d4bb] text-[10px] sm:text-xs font-medium border border-[#3e4a2b]">
+                <MapPin className="w-3 h-3 text-[#c4a159] shrink-0" />
+                <span>Venue: TBA</span>
               </span>
             </div>
-            <h1 className="font-serif text-2xl sm:text-4xl font-extrabold text-white">
+            <h1 className="font-serif text-xl sm:text-3xl md:text-4xl font-extrabold text-white break-words">
               Cultrahus Attendee Database
             </h1>
-            <p className="text-xs sm:text-sm text-[#b8c5a8] mt-2 max-w-2xl">
+            <p className="text-xs sm:text-sm text-[#b8c5a8] mt-1.5 sm:mt-2 max-w-2xl break-words">
               Live Firestore synchronization across distinct collections: 
-              <span className="text-[#e5d4aa] font-mono"> delegates, tickets, troupes, secretariat, sponsors, inquiries, registrations</span>.
+              <span className="text-[#e5d4aa] font-mono break-all text-[11px] sm:text-xs"> delegates, tickets, troupes, secretariat, sponsors, inquiries, registrations</span>.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="grid grid-cols-2 xs:flex xs:flex-wrap items-center gap-2 w-full md:w-auto shrink-0">
             <button
               id="purge-mock-btn"
               onClick={handlePurgeMock}
               title="Remove all already added dummy or mock entries"
-              className="px-3.5 py-2 rounded-xl bg-rose-950/60 hover:bg-rose-900/80 text-rose-200 text-xs font-bold border border-rose-800/60 transition flex items-center gap-1.5 shadow"
+              className="px-2.5 sm:px-3.5 py-2 rounded-xl bg-rose-950/60 hover:bg-rose-900/80 text-rose-200 text-[11px] sm:text-xs font-bold border border-rose-800/60 transition flex items-center justify-center gap-1.5 shadow"
             >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>Clean Test Data</span>
+              <Trash2 className="w-3.5 h-3.5 shrink-0" />
+              <span>Clean Test</span>
             </button>
 
             <button
               id="verify-db-btn"
               onClick={handleVerifyCollections}
-              className="px-3.5 py-2 rounded-xl bg-[#3b4928] hover:bg-[#4a5e33] text-[#e5d4aa] text-xs font-bold border border-[#52653a] transition flex items-center gap-1.5 shadow"
+              className="px-2.5 sm:px-3.5 py-2 rounded-xl bg-[#3b4928] hover:bg-[#4a5e33] text-[#e5d4aa] text-[11px] sm:text-xs font-bold border border-[#52653a] transition flex items-center justify-center gap-1.5 shadow"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span>Sync Firestore</span>
+              <RefreshCw className="w-3.5 h-3.5 shrink-0" />
+              <span>Sync DB</span>
             </button>
 
             <button
@@ -451,18 +452,18 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
               onClick={handleRunDiagnosticProbe}
               disabled={isProbing}
               title="Run live read/write latency test against Firestore"
-              className="px-3.5 py-2 rounded-xl bg-[#232c17] hover:bg-[#323f21] text-emerald-300 text-xs font-bold border border-[#485b30] transition flex items-center gap-1.5 shadow disabled:opacity-50 cursor-pointer"
+              className="px-2.5 sm:px-3.5 py-2 rounded-xl bg-[#232c17] hover:bg-[#323f21] text-emerald-300 text-[11px] sm:text-xs font-bold border border-[#485b30] transition flex items-center justify-center gap-1.5 shadow disabled:opacity-50 cursor-pointer"
             >
-              <Activity className={`w-3.5 h-3.5 ${isProbing ? 'animate-spin' : 'text-emerald-400'}`} />
-              <span>{isProbing ? 'Testing DB...' : 'Test Live DB'}</span>
+              <Activity className={`w-3.5 h-3.5 shrink-0 ${isProbing ? 'animate-spin' : 'text-emerald-400'}`} />
+              <span>{isProbing ? 'Testing...' : 'Test DB'}</span>
             </button>
 
             <button
               id="export-csv-btn"
               onClick={handleExportCSV}
-              className="px-3.5 py-2 rounded-xl bg-[#c4a159] hover:bg-[#d6b46c] text-[#1c2414] text-xs font-bold transition flex items-center gap-1.5 shadow"
+              className="px-2.5 sm:px-3.5 py-2 rounded-xl bg-[#c4a159] hover:bg-[#d6b46c] text-[#1c2414] text-[11px] sm:text-xs font-bold transition flex items-center justify-center gap-1.5 shadow"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3.5 h-3.5 shrink-0" />
               <span>Export CSV</span>
             </button>
 
@@ -470,77 +471,77 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
               id="admin-logout-btn"
               onClick={handleSignOut}
               title="Lock Admin Portal and Sign Out"
-              className="px-3.5 py-2 rounded-xl bg-[#1b2212] hover:bg-[#2d381c] text-[#e5d4aa] text-xs font-bold border border-[#4a5a32] transition flex items-center gap-1.5 shadow cursor-pointer"
+              className="col-span-2 xs:col-span-1 px-2.5 sm:px-3.5 py-2 rounded-xl bg-[#1b2212] hover:bg-[#2d381c] text-[#e5d4aa] text-[11px] sm:text-xs font-bold border border-[#4a5a32] transition flex items-center justify-center gap-1.5 shadow cursor-pointer"
             >
-              <LogOut className="w-3.5 h-3.5 text-rose-300" />
+              <LogOut className="w-3.5 h-3.5 text-rose-300 shrink-0" />
               <span>Lock Portal</span>
             </button>
           </div>
         </div>
 
         {dbNotice && (
-          <div className="mt-4 p-3 rounded-xl bg-[#344222] border border-[#5b6e41] text-[#e5d4aa] text-xs flex items-center justify-between">
-            <div className="flex items-center gap-2">
+          <div className="mt-4 p-3 rounded-xl bg-[#344222] border border-[#5b6e41] text-[#e5d4aa] text-xs flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
               <Database className="w-3.5 h-3.5 shrink-0 text-[#c4a159]" />
-              <span>{dbNotice}</span>
+              <span className="break-all">{dbNotice}</span>
             </div>
-            <button onClick={() => setDbNotice(null)} className="text-[#a8b896] hover:text-white text-xs">Dismiss</button>
+            <button onClick={() => setDbNotice(null)} className="text-[#a8b896] hover:text-white text-xs shrink-0">Dismiss</button>
           </div>
         )}
 
         {probeResult && (
-          <div className="mt-3 p-3 rounded-xl bg-[#1b2513] border border-emerald-700/60 text-emerald-200 text-xs flex items-center justify-between shadow">
-            <div className="flex items-center gap-2">
+          <div className="mt-3 p-3 rounded-xl bg-[#1b2513] border border-emerald-700/60 text-emerald-200 text-xs flex items-center justify-between gap-2 shadow">
+            <div className="flex items-center gap-2 min-w-0">
               <Activity className="w-4 h-4 shrink-0 text-emerald-400" />
-              <span className="font-mono">{probeResult}</span>
+              <span className="font-mono text-[11px] break-all">{probeResult}</span>
             </div>
-            <button onClick={() => setProbeResult(null)} className="text-[#a8b896] hover:text-white text-xs">Dismiss</button>
+            <button onClick={() => setProbeResult(null)} className="text-[#a8b896] hover:text-white text-xs shrink-0">Dismiss</button>
           </div>
         )}
       </div>
 
       {/* Real-time Metric Tiles */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-        <div className="p-4 rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
-          <div className="text-[11px] uppercase tracking-wider text-[#556345] font-bold">Total Enrolled</div>
-          <div className="text-xl sm:text-2xl font-serif font-extrabold text-[#242c18] mt-1">{stats.total}</div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3">
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
+          <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-[#556345] font-bold truncate">Total Enrolled</div>
+          <div className="text-lg sm:text-2xl font-serif font-extrabold text-[#242c18] mt-0.5 sm:mt-1 truncate">{stats.total}</div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
-          <div className="text-[11px] uppercase tracking-wider text-[#556345] font-bold">Delegates</div>
-          <div className="text-xl sm:text-2xl font-serif font-extrabold text-[#242c18] mt-1">{stats.delegates}</div>
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
+          <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-[#556345] font-bold truncate">Delegates</div>
+          <div className="text-lg sm:text-2xl font-serif font-extrabold text-[#242c18] mt-0.5 sm:mt-1 truncate">{stats.delegates}</div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
-          <div className="text-[11px] uppercase tracking-wider text-[#556345] font-bold">Passes</div>
-          <div className="text-xl sm:text-2xl font-serif font-extrabold text-[#242c18] mt-1">{stats.tickets}</div>
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
+          <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-[#556345] font-bold truncate">Passes</div>
+          <div className="text-lg sm:text-2xl font-serif font-extrabold text-[#242c18] mt-0.5 sm:mt-1 truncate">{stats.tickets}</div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
-          <div className="text-[11px] uppercase tracking-wider text-[#556345] font-bold">Troupes</div>
-          <div className="text-xl sm:text-2xl font-serif font-extrabold text-[#242c18] mt-1">{stats.plays}</div>
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
+          <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-[#556345] font-bold truncate">Troupes</div>
+          <div className="text-lg sm:text-2xl font-serif font-extrabold text-[#242c18] mt-0.5 sm:mt-1 truncate">{stats.plays}</div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
-          <div className="text-[11px] uppercase tracking-wider text-[#556345] font-bold">Secretariat</div>
-          <div className="text-xl sm:text-2xl font-serif font-extrabold text-[#242c18] mt-1">{stats.secretariat}</div>
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
+          <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-[#556345] font-bold truncate">Secretariat</div>
+          <div className="text-lg sm:text-2xl font-serif font-extrabold text-[#242c18] mt-0.5 sm:mt-1 truncate">{stats.secretariat}</div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
-          <div className="text-[11px] uppercase tracking-wider text-[#556345] font-bold">Checked-In</div>
-          <div className="text-xl sm:text-2xl font-serif font-extrabold text-emerald-800 mt-1">{stats.checkedIn}</div>
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
+          <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-[#556345] font-bold truncate">Checked-In</div>
+          <div className="text-lg sm:text-2xl font-serif font-extrabold text-emerald-800 mt-0.5 sm:mt-1 truncate">{stats.checkedIn}</div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center col-span-2 sm:col-span-1">
-          <div className="text-[11px] uppercase tracking-wider text-[#556345] font-bold">Revenue</div>
-          <div className="text-lg sm:text-xl font-serif font-extrabold text-[#242c18] mt-1">₹{stats.totalRevenue.toLocaleString('en-IN')}</div>
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center col-span-2 sm:col-span-1">
+          <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-[#556345] font-bold truncate">Revenue</div>
+          <div className="text-base sm:text-xl font-serif font-extrabold text-[#242c18] mt-0.5 sm:mt-1 truncate">₹{stats.totalRevenue.toLocaleString('en-IN')}</div>
         </div>
       </div>
 
       {/* Filter Tabs & Search Bar */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center">
+      <div className="flex flex-col md:flex-row gap-3 sm:gap-4 justify-between items-stretch md:items-center w-full">
         {/* Category Tabs */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 -mx-1 px-1 sm:mx-0 sm:px-0 sm:flex-wrap sm:pb-0 scrollbar-none w-full md:w-auto">
           {[
             { id: 'all', label: 'All Records', count: stats.total },
             { id: 'delegates', label: 'Delegates', count: stats.delegates },
@@ -554,7 +555,7 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
               key={tab.id}
               id={`filter-tab-${tab.id}`}
               onClick={() => setActiveCategory(tab.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap ${
                 activeCategory === tab.id
                   ? 'bg-[#3b4928] text-[#f7f4ec] shadow-xs'
                   : 'bg-white/80 text-[#242c18] hover:bg-white border border-[#cfc4ad]'
@@ -571,8 +572,8 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
         </div>
 
         {/* Search & Status Filters */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1 sm:w-72">
+        <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 w-full md:w-auto">
+          <div className="relative flex-1 sm:w-64 md:w-72">
             <Search className="w-4 h-4 text-[#556345] absolute left-3.5 top-3" />
             <input
               id="admin-search-input"
@@ -585,12 +586,12 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
           </div>
 
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-[#556345]" />
+            <Filter className="w-4 h-4 text-[#556345] shrink-0" />
             <select
               id="admin-status-select"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 rounded-xl bg-white border border-[#cfc4ad] text-xs text-[#242c18] focus:outline-none focus:border-[#3b4928]"
+              className="w-full sm:w-auto px-3 py-2 rounded-xl bg-white border border-[#cfc4ad] text-xs text-[#242c18] focus:outline-none focus:border-[#3b4928]"
             >
               <option value="all">All Statuses</option>
               <option value="confirmed">Confirmed</option>
@@ -603,14 +604,20 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
       </div>
 
       {/* Registrations Table */}
-      <div className="bg-[#faf8f5] border-2 border-[#cfc4ad] rounded-3xl shadow-sm overflow-hidden">
-        <div className="p-4 sm:p-5 border-b border-[#dfd7c3] flex items-center justify-between">
-          <h2 className="font-serif font-bold text-lg text-[#242c18]">
+      <div className="bg-[#faf8f5] border-2 border-[#cfc4ad] rounded-2xl sm:rounded-3xl shadow-sm overflow-hidden w-full max-w-full">
+        <div className="p-3.5 sm:p-5 border-b border-[#dfd7c3] flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4">
+          <h2 className="font-serif font-bold text-base sm:text-lg text-[#242c18]">
             Attendee Registry &amp; Dossiers ({filteredRecords.length})
           </h2>
-          <span className="text-xs text-[#556345]">
+          <span className="text-[11px] sm:text-xs text-[#556345]">
             Showing {filteredRecords.length} of {records.length} records in Firestore
           </span>
+        </div>
+
+        {/* Mobile Horizontal Scroll Hint */}
+        <div className="sm:hidden px-3.5 py-1.5 bg-[#ede4d2] text-[#556345] text-[10px] font-semibold flex items-center justify-between border-b border-[#dfd7c3]">
+          <span>↔ Swipe table horizontally for all columns</span>
+          <span className="font-mono">{filteredRecords.length} entries</span>
         </div>
 
         {loading ? (
@@ -623,8 +630,8 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
             No records match the current filter or search criteria.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-[#242c18]">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-left text-xs text-[#242c18] min-w-[760px]">
               <thead className="bg-[#ede4d2] text-[#43522f] uppercase tracking-wider font-bold border-b border-[#dfd7c3]">
                 <tr>
                   <th className="py-3.5 px-4">Tracking Code</th>
@@ -792,33 +799,33 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
 
       {/* FULL ATTENDEE DOSSIER MODAL */}
       {selectedDossier && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-[#fcfbf9] border-2 border-[#52653a] rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 sm:p-8 space-y-6 text-[#242c18] relative animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-[#fcfbf9] border-2 border-[#52653a] rounded-2xl sm:rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto shadow-2xl p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6 text-[#242c18] relative animate-in fade-in zoom-in-95 duration-150">
             {/* Modal Header */}
-            <div className="flex items-start justify-between border-b border-[#dfd7c3] pb-4">
-              <div>
-                <div className="flex items-center gap-2 flex-wrap mb-1">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#3b4928] text-[#e5d4aa]">
+            <div className="flex items-start justify-between border-b border-[#dfd7c3] pb-3.5 sm:pb-4 gap-2">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap mb-1">
+                  <span className="px-2 sm:px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-[#3b4928] text-[#e5d4aa]">
                     {selectedDossier._category || selectedDossier.type}
                   </span>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#dfd7c3] text-[#242c18] font-bold">
-                    Collection: {getCollectionNameForType(selectedDossier.type)}
+                  <span className="px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-mono bg-[#dfd7c3] text-[#242c18] font-bold">
+                    col/{getCollectionNameForType(selectedDossier.type)}
                   </span>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-100 text-emerald-800 font-bold">
+                  <span className="px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-mono bg-emerald-100 text-emerald-800 font-bold">
                     Status: {selectedDossier.status.toUpperCase()}
                   </span>
                 </div>
-                <h2 className="font-serif text-2xl font-extrabold text-[#242c18]">
+                <h2 className="font-serif text-xl sm:text-2xl font-extrabold text-[#242c18] break-words">
                   {selectedDossier.name}
                 </h2>
-                <div className="text-xs text-[#556345] mt-0.5">
+                <div className="text-xs text-[#556345] mt-0.5 break-words">
                   {selectedDossier.organization || selectedDossier.troupeName || selectedDossier.brandName || 'Independent Participant'} • {selectedDossier.cityState || 'National Capital Region'}
                 </div>
               </div>
 
               <button
                 onClick={() => setSelectedDossier(null)}
-                className="p-2 rounded-xl bg-[#ede4d2] hover:bg-[#dfd7c3] text-[#242c18] transition cursor-pointer"
+                className="p-1.5 sm:p-2 rounded-xl bg-[#ede4d2] hover:bg-[#dfd7c3] text-[#242c18] transition cursor-pointer shrink-0"
                 title="Close Dossier"
               >
                 <X className="w-5 h-5" />
@@ -826,22 +833,22 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
             </div>
 
             {/* Tracking Code Banner */}
-            <div className="p-4 rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div>
+            <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="min-w-0">
                 <div className="text-[10px] uppercase font-bold text-[#556345] tracking-wider">Accreditation Tracking Code</div>
-                <div className="font-mono text-lg font-extrabold text-[#242c18]">{selectedDossier.uniqueCode}</div>
+                <div className="font-mono text-base sm:text-lg font-extrabold text-[#242c18] break-all">{selectedDossier.uniqueCode}</div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-start sm:justify-end">
                 <button
                   onClick={() => handleCopy(selectedDossier.uniqueCode)}
-                  className="px-3 py-1.5 rounded-xl bg-white border border-[#cfc4ad] text-xs font-bold text-[#242c18] hover:bg-[#f7f4ec] transition flex items-center gap-1.5 cursor-pointer"
+                  className="flex-1 sm:flex-initial px-3 py-1.5 rounded-xl bg-white border border-[#cfc4ad] text-xs font-bold text-[#242c18] hover:bg-[#f7f4ec] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
                 >
                   <Copy className="w-3.5 h-3.5" />
                   <span>{copiedCode === selectedDossier.uniqueCode ? 'Copied!' : 'Copy Code'}</span>
                 </button>
                 <button
                   onClick={() => openPassModal(selectedDossier)}
-                  className="px-3 py-1.5 rounded-xl bg-[#3b4928] text-[#e5d4aa] text-xs font-bold hover:bg-[#4a5e33] transition flex items-center gap-1.5 cursor-pointer"
+                  className="flex-1 sm:flex-initial px-3 py-1.5 rounded-xl bg-[#3b4928] text-[#e5d4aa] text-xs font-bold hover:bg-[#4a5e33] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
                 >
                   <Printer className="w-3.5 h-3.5" />
                   <span>Print Pass</span>
@@ -851,19 +858,19 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
 
             {/* Complete Field Details Grid */}
             <div className="space-y-4">
-              <h3 className="font-serif font-bold text-base text-[#242c18] border-b border-[#dfd7c3] pb-1">
+              <h3 className="font-serif font-bold text-sm sm:text-base text-[#242c18] border-b border-[#dfd7c3] pb-1">
                 Full Registration Dossier Details
               </h3>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs">
                 <div className="p-3 rounded-xl bg-white border border-[#dfd7c3] space-y-1">
                   <span className="font-bold text-[#556345] block text-[10px] uppercase">Contact Information</span>
-                  <div className="font-medium text-[#242c18]">{selectedDossier.email}</div>
-                  <div className="font-mono text-[#556345]">{selectedDossier.phone || 'No phone provided'}</div>
-                  <div className="pt-2 flex items-center gap-2">
+                  <div className="font-medium text-[#242c18] break-all">{selectedDossier.email}</div>
+                  <div className="font-mono text-[#556345] break-all">{selectedDossier.phone || 'No phone provided'}</div>
+                  <div className="pt-2 flex flex-wrap items-center gap-2">
                     <a
                       href={`mailto:${selectedDossier.email}`}
-                      className="px-2 py-1 rounded bg-[#ebf0e2] text-[#3b4928] font-bold text-[10px] hover:bg-[#dbe6cf]"
+                      className="px-2.5 py-1 rounded bg-[#ebf0e2] text-[#3b4928] font-bold text-[10px] hover:bg-[#dbe6cf]"
                     >
                       Email Attendee
                     </a>
@@ -872,7 +879,7 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
                         href={`https://wa.me/91${selectedDossier.phone.replace(/\D/g, '')}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="px-2 py-1 rounded bg-emerald-100 text-emerald-800 font-bold text-[10px] hover:bg-emerald-200"
+                        className="px-2.5 py-1 rounded bg-emerald-100 text-emerald-800 font-bold text-[10px] hover:bg-emerald-200"
                       >
                         WhatsApp Chat
                       </a>
@@ -882,26 +889,26 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
 
                 <div className="p-3 rounded-xl bg-white border border-[#dfd7c3] space-y-1">
                   <span className="font-bold text-[#556345] block text-[10px] uppercase">Institution &amp; Region</span>
-                  <div className="font-medium text-[#242c18]">{selectedDossier.organization || 'Independent'}</div>
-                  <div className="text-[#556345]">{selectedDossier.cityState || 'National Capital Region (NCR)'}</div>
+                  <div className="font-medium text-[#242c18] break-words">{selectedDossier.organization || 'Independent'}</div>
+                  <div className="text-[#556345] break-words">{selectedDossier.cityState || 'National Capital Region (NCR)'}</div>
                   {selectedDossier.designation && (
-                    <div className="text-[11px] text-[#242c18] italic mt-1">Designation: {selectedDossier.designation}</div>
+                    <div className="text-[11px] text-[#242c18] italic mt-1 break-words">Designation: {selectedDossier.designation}</div>
                   )}
                 </div>
 
                 <div className="p-3 rounded-xl bg-white border border-[#dfd7c3] space-y-1">
                   <span className="font-bold text-[#556345] block text-[10px] uppercase">Category &amp; Event Track</span>
-                  <div className="font-semibold text-[#242c18]">
+                  <div className="font-semibold text-[#242c18] break-words">
                     {selectedDossier.ticketTier || selectedDossier.participationCategory || selectedDossier.department || selectedDossier.sponsorTier || 'General'}
                   </div>
                   {selectedDossier.parliamentTrack && (
-                    <div className="text-[#556345]">Track: {selectedDossier.parliamentTrack}</div>
+                    <div className="text-[#556345] break-words">Track: {selectedDossier.parliamentTrack}</div>
                   )}
                   {selectedDossier.foodAddon && (
-                    <div className="text-[#556345]">Hospitality: {selectedDossier.foodAddon}</div>
+                    <div className="text-[#556345] break-words">Hospitality: {selectedDossier.foodAddon}</div>
                   )}
                   {selectedDossier.seats && selectedDossier.seats.length > 0 && (
-                    <div className="font-mono text-[#556345]">Seats: {selectedDossier.seats.join(', ')}</div>
+                    <div className="font-mono text-[#556345] break-words">Seats: {selectedDossier.seats.join(', ')}</div>
                   )}
                 </div>
 
@@ -913,30 +920,30 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
                   <div className="text-[#556345]">
                     Enrolled: {selectedDossier.createdAt ? new Date(selectedDossier.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) : 'Recent'}
                   </div>
-                  <div className="text-[10px] font-mono text-[#7a8a68]">
+                  <div className="text-[10px] font-mono text-[#7a8a68] break-all">
                     Doc ID: {selectedDossier.id}
                   </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-white border border-[#dfd7c3] space-y-1 sm:col-span-2">
+                <div className="p-3 rounded-xl bg-white border border-[#dfd7c3] space-y-2 sm:col-span-2">
                   <span className="font-bold text-[#556345] block text-[10px] uppercase">Deployment Source &amp; Firestore Connection</span>
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex flex-wrap items-center gap-1.5 min-w-0">
                       {selectedDossier.source === 'vercel' || (selectedDossier.sourceUrl && selectedDossier.sourceUrl.includes('vercel')) ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-[#181f10] text-white text-[11px] font-mono font-bold">
-                          <span className="text-white text-[9px]">▲</span> Vercel Production
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#181f10] text-white text-[10px] sm:text-[11px] font-mono font-bold shrink-0">
+                          <span className="text-white text-[8px]">▲</span> Vercel Production
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#ebf0e2] text-[#344222] text-[11px] font-bold">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#ebf0e2] text-[#344222] text-[10px] sm:text-[11px] font-bold shrink-0">
                           <Globe className="w-3 h-3 text-[#556345]" /> Direct Web
                         </span>
                       )}
-                      <span className="text-[11px] font-mono text-[#556345] bg-[#f4efe4] px-2 py-0.5 rounded border border-[#dfd7c3]">
+                      <span className="text-[10px] sm:text-[11px] font-mono text-[#556345] bg-[#f4efe4] px-2 py-0.5 rounded border border-[#dfd7c3] break-all">
                         {selectedDossier.sourceUrl || 'https://cultrahus-organization.vercel.app'}
                       </span>
                     </div>
-                    <div className="text-[11px] font-medium text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                      ✓ Synchronized to DB ai-studio-1959e55b-78c9-4673-be88-b7d93b87ba81
+                    <div className="text-[10px] sm:text-[11px] font-medium text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 break-all shrink-0">
+                      ✓ Synced: DB ai-studio-1959e55b-78c9-4673-be88-b7d93b87ba81
                     </div>
                   </div>
                 </div>
@@ -1013,13 +1020,13 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
             </div>
 
             {/* Status Manager and Action Bar */}
-            <div className="pt-4 border-t border-[#dfd7c3] flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-[#556345]">Update Status:</span>
+            <div className="pt-4 border-t border-[#dfd7c3] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <div className="flex items-center justify-between sm:justify-start gap-2">
+                <span className="text-xs font-bold text-[#556345] shrink-0">Update Status:</span>
                 <select
                   value={selectedDossier.status}
                   onChange={(e) => handleStatusChange(selectedDossier, e.target.value as RegistrationRecord['status'])}
-                  className="px-3 py-1.5 rounded-xl bg-white border border-[#cfc4ad] text-xs font-bold text-[#242c18] focus:outline-none focus:border-[#3b4928]"
+                  className="flex-1 sm:flex-initial px-3 py-1.5 rounded-xl bg-white border border-[#cfc4ad] text-xs font-bold text-[#242c18] focus:outline-none focus:border-[#3b4928]"
                 >
                   <option value="confirmed">Confirmed</option>
                   <option value="checked-in">Checked In</option>
@@ -1029,17 +1036,17 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
                 </select>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
                 <button
                   onClick={() => handleDelete(selectedDossier.id, selectedDossier.name, selectedDossier.type)}
-                  className="px-3.5 py-1.5 rounded-xl bg-rose-50 text-rose-800 hover:bg-rose-100 text-xs font-bold border border-rose-200 transition flex items-center gap-1 cursor-pointer"
+                  className="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl bg-rose-50 text-rose-800 hover:bg-rose-100 text-xs font-bold border border-rose-200 transition flex items-center justify-center gap-1 cursor-pointer"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="w-3.5 h-3.5 shrink-0" />
                   <span>Delete Dossier</span>
                 </button>
                 <button
                   onClick={() => setSelectedDossier(null)}
-                  className="px-4 py-1.5 rounded-xl bg-[#ede4d2] hover:bg-[#dfd7c3] text-[#242c18] text-xs font-bold transition cursor-pointer"
+                  className="flex-1 sm:flex-initial px-4 py-1.5 rounded-xl bg-[#ede4d2] hover:bg-[#dfd7c3] text-[#242c18] text-xs font-bold transition cursor-pointer text-center"
                 >
                   Close
                 </button>

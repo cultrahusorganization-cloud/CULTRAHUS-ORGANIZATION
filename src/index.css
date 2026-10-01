@@ -16,6 +16,12 @@
     --color-gold-accent: #c4a159;
   }
 
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+    width: 100%;
+  }
+
   body {
     color: #242c18;
     background-color: #f7f4ec;

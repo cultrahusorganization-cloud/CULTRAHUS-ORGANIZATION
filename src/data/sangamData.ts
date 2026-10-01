@@ -95,8 +95,8 @@ export const FESTIVAL_FAQS: FAQItem[] = [
   {
     id: "faq-2",
     category: "Tickets",
-    question: "How do Conclave Ticket passes differ between Classic, Royal, and VIP Sovereign?",
-    answer: "Classic (₹400, crossed from ₹600) offers general amphitheatre & auditorium entry with no food included. Royal (₹600, crossed from ₹900) includes reserved mid-tier auditorium seating and a high-tea refreshment box. VIP Sovereign (₹800, crossed from ₹1,200) guarantees front-row seating (Rows A-B), fast-track security access, and food included (complimentary royal banquet dining). IMPORTANT: Every pass tier includes complete unrestricted entry to both the Grand Garba Night / Dandiya Raas and the Celebrity DJ Night at zero extra charge!"
+    question: "How do Conclave Ticket passes differ between the 2-Day Pass and Single-Day Pass?",
+    answer: "The ₹1,000 2-Day Pass includes entry on Day 1 AND Day 2 (Day 1: Dance Competition, Music Competition, Singers’ Performance and Big Programme; Day 2: Garba Night, Dandiya Night and DJ Night) with Both Days Included. The ₹600 Single-Day Pass gives you full access to your chosen day: choose either Day 1 or Day 2. Both passes come with instant authenticated digital passes and QR codes!"
   },
   {
     id: "faq-3",
@@ -135,69 +135,82 @@ export const PARTICIPATION_CATEGORIES = [
   "Student Youth Delegate"
 ];
 
+export interface DaySchedule {
+  dayNumber: number;
+  dayLabel: string;
+  tagline: string;
+  events: string[];
+}
+
+export const SANGAM_SCHEDULE: DaySchedule[] = [
+  {
+    dayNumber: 1,
+    dayLabel: 'DAY 1',
+    tagline: 'Competitions & Grand Cultural Showcase',
+    events: [
+      'Dance Competition',
+      'Music Competition',
+      "Singers’ Performance",
+      'Big Programme'
+    ]
+  },
+  {
+    dayNumber: 2,
+    dayLabel: 'DAY 2',
+    tagline: 'Folk Heritage & Electronic Euphoria',
+    events: [
+      'Garba Night',
+      'Dandiya Night',
+      'DJ Night'
+    ]
+  }
+];
+
 export interface TicketTier {
-  id: 'classic' | 'royal' | 'sovereign';
+  id: 'two_day' | 'single_day' | string;
   name: string;
   price: number;
-  originalPrice: number;
+  originalPrice?: number;
   description: string;
   features: string[];
   food: string;
   badge?: string;
   popular?: boolean;
+  daysIncludedText?: string;
 }
 
 export const TICKET_TIERS: TicketTier[] = [
   {
-    id: 'classic',
-    name: 'Classic Pass',
-    price: 400,
-    originalPrice: 600,
-    description: 'General amphitheatre & auditorium entry pass for culture enthusiasts.',
+    id: 'two_day',
+    name: '2-Day Pass',
+    price: 1000,
+    originalPrice: 1500,
+    popular: true,
+    badge: 'Best Value • 2 Days',
+    daysIncludedText: '✓ Both Days Included',
+    description: 'Entry on Day 1 AND Day 2. Complete festival pass for the entire 2-day extravaganza.',
     features: [
-      'Access to open amphitheatre & general auditorium zone',
-      'Unrestricted entry to Dandiya & Garba Raas celebration',
-      'Full entry to Celebrity DJ & EDM Finale',
-      'Digital attendance credentials with QR code',
-      'No food included (cafeteria stalls available on-site)'
+      'Entry on Day 1 AND Day 2',
+      'Day 1: Dance Competition, Music Competition, Singers’ Performance and Big Programme',
+      'Day 2: Garba Night, Dandiya Night and DJ Night',
+      '✓ Both Days Included'
     ],
-    food: 'No food included'
+    food: 'Full 2-Day Festival Access'
   },
   {
-    id: 'royal',
-    name: 'Royal Pass',
+    id: 'single_day',
+    name: 'Single-Day Pass',
     price: 600,
     originalPrice: 900,
-    popular: true,
-    badge: 'Best Value',
-    description: 'Reserved mid-tier auditorium seating + high-tea refreshment box.',
+    badge: 'Flexible Day Pass',
+    daysIncludedText: 'Customer can select either Day 1 OR Day 2',
+    description: 'Select either Day 1 OR Day 2 to attend your preferred festival celebrations.',
     features: [
-      'Reserved middle-tier seats in main proscenium auditorium',
-      'Complimentary High-Tea Refreshment Box with beverage',
-      'Complete access to Dandiya & Garba Raas celebration',
-      'Full entry to Celebrity DJ & EDM Finale',
-      'Priority festival registration check-in counter',
-      'Commemorative festival wristband'
+      'Customer can select either Day 1 OR Day 2',
+      'If Day 1 is selected: Dance Competition, Music Competition, Singers’ Performance and Big Programme',
+      'If Day 2 is selected: Garba Night, Dandiya Night and DJ Night'
     ],
-    food: 'High-Tea Refreshment Box Included'
-  },
-  {
-    id: 'sovereign',
-    name: 'VIP Sovereign Pass',
-    price: 800,
-    originalPrice: 1200,
-    badge: 'Premium VIP',
-    description: 'Front-row seating, fast-track access, and royal banquet dining included.',
-    features: [
-      'Prime Front-Row Seating (Rows A-B) with supreme acoustic view',
-      'Complimentary Royal Banquet Dining (Sattvic / Chef Dinner)',
-      'Fast-track VIP security and expedited stage entry',
-      'Complete access to Dandiya & Garba Raas celebration',
-      'Full entry to Celebrity DJ & EDM Finale',
-      'Festival Welcome Kit with souvenir monograph',
-      'Access to VIP lounge and artist meet-and-greet foyer'
-    ],
-    food: 'Complimentary Royal Banquet Dining Included'
+    food: 'Single Day Festival Access'
   }
 ];
 

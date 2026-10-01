@@ -20,8 +20,9 @@ export interface RegistrationRecord {
   accessCode?: string;
 
   // Ticket specific
-  ticketTier?: 'classic' | 'royal' | 'sovereign' | 'Standard' | 'VIP' | 'Speaker' | 'Student' | 'Executive';
+  ticketTier?: 'two_day' | 'single_day' | 'classic' | 'royal' | 'sovereign' | 'Standard' | 'VIP' | 'Speaker' | 'Student' | 'Executive' | string;
   tierName?: string;
+  selectedDay?: 'Day 1' | 'Day 2' | 'Both Days' | string;
   quantity?: number;
   seats?: string[];
   foodAddon?: string;

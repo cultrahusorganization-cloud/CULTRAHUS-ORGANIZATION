@@ -43,12 +43,12 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf7f0] text-[#242c18] flex flex-col font-sans selection:bg-[#3b4928] selection:text-[#f7f4ec]">
+    <div className="min-h-screen bg-[#faf7f0] text-[#242c18] flex flex-col font-sans selection:bg-[#3b4928] selection:text-[#f7f4ec] w-full max-w-full overflow-x-hidden">
       {/* Navigation Header */}
       <Header activeTab={activeTab} setActiveTab={handleTabChange} />
 
       {/* Main Content View */}
-      <main className="flex-1">
+      <main className="flex-1 w-full max-w-full overflow-x-hidden">
         {activeTab === 'home' && <Overview setActiveTab={handleTabChange} />}
         {activeTab === 'delegate' && <DelegatePass onPassGenerated={setDigitalPassData} />}
         {activeTab === 'tickets' && <BookTickets onPassGenerated={setDigitalPassData} />}

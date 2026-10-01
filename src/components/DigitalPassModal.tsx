@@ -53,29 +53,29 @@ export const DigitalPassModal: React.FC<DigitalPassModalProps> = ({ passData, on
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-[#faf7f0] text-[#242c18] rounded-3xl shadow-2xl border border-[#cfc5b0] overflow-hidden my-8 animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm overflow-y-auto">
+      <div className="relative w-full max-w-2xl bg-[#faf7f0] text-[#242c18] rounded-2xl sm:rounded-3xl shadow-2xl border border-[#cfc5b0] overflow-hidden my-4 sm:my-8 animate-in zoom-in-95 duration-200">
         {/* Modal Controls Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-[#242c18] text-[#f4efe4] print:hidden">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-[#d7c494]" />
-            <span className="font-serif font-bold text-base tracking-wide">
-              Official Festival Credential
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-[#242c18] text-[#f4efe4] print:hidden gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <ShieldCheck className="w-5 h-5 text-[#d7c494] shrink-0" />
+            <span className="font-serif font-bold text-sm sm:text-base tracking-wide truncate">
+              Official Credential
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               id="print-pass-btn"
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#364325] hover:bg-[#475731] text-[#d7c494] text-xs font-bold rounded-xl transition-colors border border-[#5b6e41]/60 shadow"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-[#364325] hover:bg-[#475731] text-[#d7c494] text-xs font-bold rounded-xl transition-colors border border-[#5b6e41]/60 shadow cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Print Credential</span>
+              <span>Print</span>
             </button>
             <button
               id="close-pass-modal-btn"
               onClick={onClose}
-              className="p-1.5 text-[#c9d6ba] hover:text-white rounded-xl hover:bg-white/10 transition-colors"
+              className="p-1.5 text-[#c9d6ba] hover:text-white rounded-xl hover:bg-white/10 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -83,30 +83,32 @@ export const DigitalPassModal: React.FC<DigitalPassModalProps> = ({ passData, on
         </div>
 
         {/* Printable Pass Canvas */}
-        <div id="printable-pass" className="p-6 sm:p-8 bg-[#faf7f0]">
-          <div className="border-4 border-double border-[#364325]/40 rounded-2xl p-5 sm:p-6 relative bg-gradient-to-b from-[#fffefc] to-[#f4efe4] shadow-sm">
+        <div id="printable-pass" className="p-3 sm:p-6 md:p-8 bg-[#faf7f0]">
+          <div className="border-2 sm:border-4 border-double border-[#364325]/40 rounded-xl sm:rounded-2xl p-4 sm:p-6 relative bg-gradient-to-b from-[#fffefc] to-[#f4efe4] shadow-sm">
             {/* Top Pass Brand Banner */}
-            <div className="flex items-start justify-between border-b-2 border-[#cfc5b0] pb-4 mb-5">
-              <div className="flex items-center gap-3">
-                <CultrahusLogo size="md" />
-                <div>
-                  <span className="text-[10px] tracking-widest uppercase font-bold text-[#5b6e41]">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between border-b-2 border-[#cfc5b0] pb-3 sm:pb-4 mb-4 sm:mb-5 gap-3">
+              <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                <div className="shrink-0">
+                  <CultrahusLogo size="md" />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[9px] sm:text-[10px] tracking-widest uppercase font-bold text-[#5b6e41] block">
                     Republic of Arts • National Directorate
                   </span>
-                  <h2 className="font-serif text-2xl sm:text-3xl font-extrabold text-[#242c18] leading-tight">
+                  <h2 className="font-serif text-xl sm:text-3xl font-extrabold text-[#242c18] leading-tight truncate">
                     Cultrahus Sangam 2026
                   </h2>
-                  <p className="text-xs text-[#556345] font-semibold">
+                  <p className="text-[11px] sm:text-xs text-[#556345] font-semibold line-clamp-2">
                     National Theatre Conclave, Cultural Parliament &amp; Performing Arts Festival
                   </p>
                 </div>
               </div>
 
-              <div className="text-right">
-                <div className="inline-block px-3 py-1 bg-[#ebf0e2] border border-[#c4d2b5] rounded-lg text-[#334122] font-mono font-bold text-xs">
+              <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1 shrink-0">
+                <div className="inline-block px-2.5 sm:px-3 py-1 bg-[#ebf0e2] border border-[#c4d2b5] rounded-lg text-[#334122] font-mono font-bold text-xs">
                   {passData.code}
                 </div>
-                <div className="text-[10px] font-semibold text-[#364325] flex items-center justify-end gap-1 mt-1">
+                <div className="text-[10px] font-semibold text-[#364325] flex items-center justify-end gap-1">
                   <CheckCircle2 className="w-3 h-3 text-[#5b6e41]" />
                   <span>Authenticated</span>
                 </div>
@@ -114,14 +116,14 @@ export const DigitalPassModal: React.FC<DigitalPassModalProps> = ({ passData, on
             </div>
 
             {/* Credential Title Banner */}
-            <div className="bg-[#3b4928] text-[#f7f4ec] px-4 py-2 rounded-xl mb-5 flex items-center justify-between shadow-sm">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#e5d4aa]" />
-                <span className="font-serif font-bold text-sm tracking-wide">
+            <div className="bg-[#3b4928] text-[#f7f4ec] px-3 sm:px-4 py-2 rounded-xl mb-4 sm:mb-5 flex items-center justify-between shadow-sm gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                <Sparkles className="w-4 h-4 text-[#e5d4aa] shrink-0" />
+                <span className="font-serif font-bold text-xs sm:text-sm tracking-wide truncate">
                   {passData.title}
                 </span>
               </div>
-              <span className="text-[10px] font-mono uppercase tracking-widest bg-[#ede4d2] text-[#242c18] px-2 py-0.5 rounded font-bold">
+              <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-widest bg-[#ede4d2] text-[#242c18] px-2 py-0.5 rounded font-bold shrink-0">
                 {passData.type.toUpperCase()}
               </span>
             </div>

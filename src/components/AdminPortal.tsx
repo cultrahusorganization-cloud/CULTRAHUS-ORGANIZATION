@@ -208,15 +208,15 @@ export const AdminPortal: React.FC<Props> = ({ records, isLoading, onRefresh }) 
   }
 
   return (
-    <div id="admin-portal-view" className="space-y-6">
+    <div id="admin-portal-view" className="space-y-6 w-full max-w-full overflow-hidden">
       {/* Top Header */}
-      <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl border shadow-sm ${config.cardBg} ${config.cardBorder} ${config.textPrimary}`}>
+      <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 sm:p-6 rounded-2xl border shadow-sm ${config.cardBg} ${config.cardBorder} ${config.textPrimary}`}>
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: config.dotColor }}>
             <Shield className="w-4 h-4" /> Firebase Connected Database
           </div>
-          <h2 className="text-2xl font-bold">Admin Control Center</h2>
-          <p className={`text-sm mt-0.5 ${config.textMuted}`}>
+          <h2 className="text-xl sm:text-2xl font-bold">Admin Control Center</h2>
+          <p className={`text-xs sm:text-sm mt-0.5 ${config.textMuted}`}>
             Real-time feed of all registered delegates and ticket buyers from Vercel & AI Studio.
           </p>
         </div>
@@ -242,18 +242,18 @@ export const AdminPortal: React.FC<Props> = ({ records, isLoading, onRefresh }) 
       </div>
 
       {/* Firebase Collections & Console Access Card */}
-      <div className={`p-5 rounded-2xl border shadow-sm ${config.cardBg} ${config.cardBorder} ${config.textPrimary}`}>
+      <div className={`p-4 sm:p-5 rounded-2xl border shadow-sm ${config.cardBg} ${config.cardBorder} ${config.textPrimary}`}>
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <Database className="w-4 h-4 text-amber-500" />
+              <Database className="w-4 h-4 text-amber-500 shrink-0" />
               <h3 className="text-sm font-bold">Firestore Database & Storage Collections</h3>
-              <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shrink-0">
                 Connected
               </span>
             </div>
-            <p className={`text-xs ${config.textMuted}`}>
-              Your data is stored under Firebase Project <span className="font-mono text-white font-semibold">gen-lang-client-0207271679</span> (Database: <span className="font-mono text-white font-semibold">ai-studio-1959e55b-78c9-4673-be88-b7d93b87ba81</span>).
+            <p className={`text-xs ${config.textMuted} break-words`}>
+              Your data is stored under Firebase Project <span className="font-mono text-white font-semibold break-all">gen-lang-client-0207271679</span> (Database: <span className="font-mono text-white font-semibold break-all">ai-studio-1959e55b-78c9-4673-be88-b7d93b87ba81</span>).
             </p>
           </div>
 
@@ -481,8 +481,8 @@ export const AdminPortal: React.FC<Props> = ({ records, isLoading, onRefresh }) 
         </div>
 
         {/* Records Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
+        <div className="overflow-x-auto w-full">
+          <table className="w-full text-left text-xs border-collapse min-w-[720px]">
             <thead className={`uppercase tracking-wider font-semibold border-b ${config.cardBorder} ${
               theme === 'light' ? 'bg-stone-100/80 text-stone-600' : 'bg-zinc-900/80 text-zinc-400'
             }`}>
