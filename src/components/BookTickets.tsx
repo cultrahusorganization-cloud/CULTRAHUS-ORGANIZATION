@@ -70,8 +70,8 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
     }
 
     const tierDisplayName = selectedTier === 'two_day' 
-      ? '₹1,000 — 2-Day Pass (Both Days Included)' 
-      : `₹600 — Single-Day Pass (${selectedDay})`;
+      ? '₹700 — 2-Day Pass (Limited Time Offer • Both Days Included)' 
+      : `₹400 — Single-Day Pass (Limited Time Offer • ${selectedDay})`;
 
     const chosenDayValue = selectedTier === 'two_day'
       ? 'Both Days (Day 1 & Day 2)'
@@ -160,7 +160,7 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
     onPassGenerated({
       type: 'ticket',
       code: createdRecord.uniqueCode,
-      title: createdRecord.tierName || (isTwoDay ? '2-Day Pass (Both Days Included)' : `Single-Day Pass (${dayLabel})`),
+      title: createdRecord.tierName || (isTwoDay ? '₹700 — 2-Day Pass (Both Days Included)' : `₹400 — Single-Day Pass (${dayLabel})`),
       fullName: createdRecord.name,
       email: createdRecord.email,
       phone: createdRecord.phone,
@@ -361,20 +361,46 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
 
       {activeTab === 'book' ? (
         <div className="space-y-10">
-          {/* 2 Ticket Tier Cards: ₹1,000 (2-Day Pass) & ₹600 (Single-Day Pass) */}
+          {/* HIGHLIGHTED LIMITED TIME OFFER CALLOUT BANNER */}
+          <div className="max-w-4xl mx-auto">
+            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#fef3c7] via-[#fde68a]/50 to-[#fef3c7] border-2 border-[#b45309] shadow-md flex flex-col md:flex-row items-center justify-between gap-3 text-center md:text-left">
+              <div className="flex items-center gap-3">
+                <span className="px-3.5 py-1.5 rounded-full bg-[#b45309] text-white text-xs font-extrabold uppercase tracking-wider shadow flex items-center gap-1.5 shrink-0 animate-pulse">
+                  <Sparkles className="w-4 h-4 text-[#fde68a]" />
+                  <span>LIMITED TIME OFFER</span>
+                </span>
+                <div>
+                  <h3 className="font-serif font-extrabold text-base sm:text-lg text-[#78350f] leading-tight">
+                    Special Conclave Ticket Prices Slashed!
+                  </h3>
+                  <p className="text-xs text-[#92400e] font-semibold mt-0.5">
+                    Single-Day Pass cut down from <span className="line-through text-[#b45309] font-bold">₹600</span> to <strong className="text-[#78350f] text-sm font-extrabold">₹400</strong> • 2-Day Pass cut down from <span className="line-through text-[#b45309] font-bold">₹1,000</span> to <strong className="text-[#78350f] text-sm font-extrabold">₹700</strong>!
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="px-3.5 py-1.5 bg-[#b45309] text-[#fef3c7] rounded-xl text-xs font-extrabold uppercase tracking-wide shadow-xs border border-[#92400e]">
+                  🔥 Save up to ₹300 per pass
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 2 Ticket Tier Cards: ₹700 (2-Day Pass) & ₹400 (Single-Day Pass) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {/* TICKET 1: ₹1,000 — 2-DAY PASS */}
+            {/* TICKET 1: ₹700 — 2-DAY PASS (CUT FROM ₹1,000) */}
             <div
               id="tier-card-two_day"
               onClick={() => setSelectedTier('two_day')}
               className={`cursor-pointer rounded-3xl p-6 sm:p-7 border-2 transition-all duration-200 relative flex flex-col justify-between ${
                 selectedTier === 'two_day'
-                  ? 'bg-[#faf7f0] border-[#3b4928] shadow-lg ring-2 ring-[#3b4928]/20'
+                  ? 'bg-[#faf7f0] border-[#b45309] shadow-lg ring-2 ring-[#b45309]/20'
                   : 'bg-[#faf8f5] border-[#cfc4ad] hover:border-[#8e9f73] shadow-xs'
               }`}
             >
-              <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full bg-[#3b4928] text-[#e5d4aa] text-[11px] font-extrabold uppercase tracking-wider shadow">
-                Best Value • 2-Day Pass
+              <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full bg-[#b45309] text-white text-[11px] font-extrabold uppercase tracking-wider shadow flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-[#fde68a]" />
+                <span>LIMITED TIME OFFER • 2-DAY PASS</span>
               </div>
 
               <div>
@@ -398,16 +424,22 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
                   </div>
                 </div>
 
-                <div className="flex items-baseline gap-2 mb-3">
+                {/* Price with Cut */}
+                <div className="flex items-baseline gap-2 mb-1.5">
                   <span className="font-serif font-extrabold text-4xl text-[#242c18]">
-                    ₹1,000
+                    ₹700
                   </span>
-                  <span className="text-xs text-[#8e9f73] line-through font-normal">
-                    ₹1,500
+                  <span className="text-base text-[#b45309] line-through font-extrabold">
+                    ₹1,000
                   </span>
                   <span className="text-[10px] text-[#556345] uppercase font-bold">
                     / person
                   </span>
+                </div>
+
+                {/* Highlighted Cut Badge */}
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#fef3c7] text-[#92400e] border border-[#fde68a] text-[10px] font-extrabold uppercase tracking-wider mb-3">
+                  <span>⚡ ₹1,000 CUT TO ₹700 • LIMITED TIME OFFER</span>
                 </div>
 
                 {/* Clearly Show: Both Days Included */}
@@ -471,18 +503,19 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
               </div>
             </div>
 
-            {/* TICKET 2: ₹600 — SINGLE-DAY PASS */}
+            {/* TICKET 2: ₹400 — SINGLE-DAY PASS (CUT FROM ₹600) */}
             <div
               id="tier-card-single_day"
               onClick={() => setSelectedTier('single_day')}
               className={`cursor-pointer rounded-3xl p-6 sm:p-7 border-2 transition-all duration-200 relative flex flex-col justify-between ${
                 selectedTier === 'single_day'
-                  ? 'bg-[#faf7f0] border-[#3b4928] shadow-lg ring-2 ring-[#3b4928]/20'
+                  ? 'bg-[#faf7f0] border-[#b45309] shadow-lg ring-2 ring-[#b45309]/20'
                   : 'bg-[#faf8f5] border-[#cfc4ad] hover:border-[#8e9f73] shadow-xs'
               }`}
             >
-              <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full bg-[#627349] text-white text-[11px] font-extrabold uppercase tracking-wider shadow">
-                Flexible Day Pass
+              <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full bg-[#b45309] text-white text-[11px] font-extrabold uppercase tracking-wider shadow flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-[#fde68a]" />
+                <span>LIMITED TIME OFFER • SINGLE-DAY</span>
               </div>
 
               <div>
@@ -506,16 +539,22 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
                   </div>
                 </div>
 
-                <div className="flex items-baseline gap-2 mb-3">
+                {/* Price with Cut */}
+                <div className="flex items-baseline gap-2 mb-1.5">
                   <span className="font-serif font-extrabold text-4xl text-[#242c18]">
-                    ₹600
+                    ₹400
                   </span>
-                  <span className="text-xs text-[#8e9f73] line-through font-normal">
-                    ₹900
+                  <span className="text-base text-[#b45309] line-through font-extrabold">
+                    ₹600
                   </span>
                   <span className="text-[10px] text-[#556345] uppercase font-bold">
                     / person
                   </span>
+                </div>
+
+                {/* Highlighted Cut Badge */}
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#fef3c7] text-[#92400e] border border-[#fde68a] text-[10px] font-extrabold uppercase tracking-wider mb-3">
+                  <span>⚡ ₹600 CUT TO ₹400 • LIMITED TIME OFFER</span>
                 </div>
 
                 {/* CLEAR SELECTION OPTION: ○ Day 1  ○ Day 2 */}
@@ -656,10 +695,14 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
             <h2 className="font-serif font-bold text-2xl text-[#242c18] mb-1">
               Pass Holder Information
             </h2>
-            <p className="text-xs text-[#556345] mb-6">
-              Selected: <strong className="text-[#242c18]">
-                {selectedTier === 'two_day' ? '₹1,000 — 2-Day Pass (Both Days Included)' : `₹600 — Single-Day Pass (${selectedDay})`}
+            <p className="text-xs text-[#556345] mb-6 flex flex-wrap items-center gap-2">
+              <span>Selected:</span>
+              <strong className="text-[#242c18]">
+                {selectedTier === 'two_day' ? '₹700 — 2-Day Pass (Both Days Included)' : `₹400 — Single-Day Pass (${selectedDay})`}
               </strong>
+              <span className="px-2 py-0.5 rounded bg-[#fef3c7] text-[#92400e] border border-[#fde68a] text-[10px] font-extrabold uppercase tracking-wider">
+                Limited Time Offer
+              </span>
             </p>
 
             {errorMsg && (

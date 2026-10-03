@@ -96,7 +96,7 @@ export const FESTIVAL_FAQS: FAQItem[] = [
     id: "faq-2",
     category: "Tickets",
     question: "How do Conclave Ticket passes differ between the 2-Day Pass and Single-Day Pass?",
-    answer: "The ₹1,000 2-Day Pass includes entry on Day 1 AND Day 2 (Day 1: Dance Competition, Music Competition, Singers’ Performance and Big Programme; Day 2: Garba Night, Dandiya Night and DJ Night) with Both Days Included. The ₹600 Single-Day Pass gives you full access to your chosen day: choose either Day 1 or Day 2. Both passes come with instant authenticated digital passes and QR codes!"
+    answer: "Limited Time Offer: Ticket prices are cut down to special festive rates! The 2-Day Pass is now just ₹700 (cut down from ₹1,000) with Both Days Included (Day 1: Dance Competition, Music Competition, Singers’ Performance and Big Programme; Day 2: Garba Night, Dandiya Night and DJ Night). The Single-Day Pass is now ₹400 (cut down from ₹600) for your chosen day (Day 1 or Day 2). Both passes include instant authenticated digital passes and QR codes!"
   },
   {
     id: "faq-3",
@@ -183,12 +183,12 @@ export const TICKET_TIERS: TicketTier[] = [
   {
     id: 'two_day',
     name: '2-Day Pass',
-    price: 1000,
-    originalPrice: 1500,
+    price: 700,
+    originalPrice: 1000,
     popular: true,
-    badge: 'Best Value • 2 Days',
+    badge: 'Limited Time Offer',
     daysIncludedText: '✓ Both Days Included',
-    description: 'Entry on Day 1 AND Day 2. Complete festival pass for the entire 2-day extravaganza.',
+    description: 'Limited Time Offer: Price cut from ₹1,000 to ₹700! Entry on Day 1 AND Day 2.',
     features: [
       'Entry on Day 1 AND Day 2',
       'Day 1: Dance Competition, Music Competition, Singers’ Performance and Big Programme',
@@ -200,11 +200,11 @@ export const TICKET_TIERS: TicketTier[] = [
   {
     id: 'single_day',
     name: 'Single-Day Pass',
-    price: 600,
-    originalPrice: 900,
-    badge: 'Flexible Day Pass',
+    price: 400,
+    originalPrice: 600,
+    badge: 'Limited Time Offer',
     daysIncludedText: 'Customer can select either Day 1 OR Day 2',
-    description: 'Select either Day 1 OR Day 2 to attend your preferred festival celebrations.',
+    description: 'Limited Time Offer: Price cut from ₹600 to ₹400! Select either Day 1 OR Day 2.',
     features: [
       'Customer can select either Day 1 OR Day 2',
       'If Day 1 is selected: Dance Competition, Music Competition, Singers’ Performance and Big Programme',

@@ -63,7 +63,7 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
                   onClick={() => handleNav('tickets')}
                   className="hover:text-white hover:underline transition-colors"
                 >
-                  Book Conclave Passes (From ₹600)
+                  Book Conclave Passes (From ₹400 • Limited Offer)
                 </button>
               </li>
               <li>
