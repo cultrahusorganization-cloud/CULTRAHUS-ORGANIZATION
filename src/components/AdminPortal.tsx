@@ -20,7 +20,7 @@ import {
   Shield,
   Filter,
   DollarSign,
-  QrCode,
+  Key,
   Globe,
   Database
 } from 'lucide-react';
@@ -365,7 +365,7 @@ export const AdminPortal: React.FC<Props> = ({ records, isLoading, onRefresh }) 
       <div className={`p-5 rounded-2xl border shadow-sm ${theme === 'light' ? 'bg-stone-900 text-white' : 'bg-zinc-900/90 text-white'} ${config.cardBorder}`}>
         <form onSubmit={handleVerifyCode} className="flex flex-col md:flex-row items-center gap-3">
           <div className="flex items-center gap-2 text-sm font-semibold whitespace-nowrap" style={{ color: config.dotColor }}>
-            <QrCode className="w-5 h-5" /> Quick Pass Verifier:
+            <Key className="w-5 h-5" /> Quick Pass Code Verifier:
           </div>
           <div className="relative flex-1 w-full">
             <input

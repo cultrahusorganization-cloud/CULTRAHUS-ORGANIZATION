@@ -24,11 +24,11 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
           <div className="space-y-4">
             <CultrahusLogo size="lg" showText textColor="light" />
             <p className="text-xs text-[#b8c5a8] leading-relaxed pt-2">
-              India’s premier confluence of proscenium dramaturgy, collegiate theatre societies, classical choreography, and the national youth cultural parliament.
+              The grand festive celebration uniting authentic Garba &amp; Dandiya Raas with high-octane Celebrity DJ Night on Sunday, 18 October 2026.
             </p>
             <div className="pt-2">
               <span className="inline-block px-3 py-1 rounded bg-[#3b4928] text-[#e5d4aa] text-[10px] font-bold uppercase tracking-wider border border-[#52653a]">
-                Vision to Realism • 18 Oct 2026
+                Garba &amp; DJ Night • 18 Oct 2026
               </span>
             </div>
           </div>
@@ -50,29 +50,11 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
               </li>
               <li>
                 <button
-                  id="footer-nav-delegate"
-                  onClick={() => handleNav('delegate')}
-                  className="hover:text-white hover:underline transition-colors"
-                >
-                  Delegate Accreditation (₹650)
-                </button>
-              </li>
-              <li>
-                <button
                   id="footer-nav-tickets"
                   onClick={() => handleNav('tickets')}
                   className="hover:text-white hover:underline transition-colors"
                 >
-                  Book Conclave Passes (From ₹400 • Limited Offer)
-                </button>
-              </li>
-              <li>
-                <button
-                  id="footer-nav-troupe"
-                  onClick={() => handleNav('troupe')}
-                  className="hover:text-white hover:underline transition-colors"
-                >
-                  Troupe &amp; Play Dossier Registration
+                  Book Entry Passes (From ₹250 • Garba &amp; DJ Night)
                 </button>
               </li>
               <li>
@@ -141,7 +123,7 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab }) => {
             <div className="space-y-2.5 text-xs text-[#c8d4bb]">
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-[#e5d4aa] shrink-0 mt-0.5" />
-                <span>Venue: TBA (To Be Announced) • NCR, India</span>
+                <span>Gurgaon University, Sector 51, Gurugram, Haryana</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-[#e5d4aa] shrink-0" />

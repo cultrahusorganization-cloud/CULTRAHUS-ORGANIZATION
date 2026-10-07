@@ -156,8 +156,9 @@ export async function registerParticipant(data: {
   parliamentTrack?: string;
   priorExperience?: string;
   accessCode?: string;
-  ticketTier?: 'two_day' | 'single_day' | 'classic' | 'royal' | 'sovereign' | 'Standard' | 'VIP' | 'Speaker' | 'Student' | 'Executive' | string;
+  ticketTier?: 'single_person' | 'couple' | 'two_day' | 'single_day' | 'classic' | 'royal' | 'sovereign' | 'Standard' | 'VIP' | 'Speaker' | 'Student' | 'Executive' | string;
   tierName?: string;
+  partnerName?: string;
   selectedDay?: string;
   quantity?: number;
   seats?: string[];
@@ -192,6 +193,7 @@ export async function registerParticipant(data: {
     accessCode: data.accessCode || '',
     ticketTier: data.ticketTier,
     tierName: data.tierName || '',
+    partnerName: data.partnerName?.trim() || '',
     selectedDay: data.selectedDay || '',
     quantity: data.quantity || 1,
     seats: data.seats || [],

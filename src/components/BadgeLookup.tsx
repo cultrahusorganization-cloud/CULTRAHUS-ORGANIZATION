@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { RegistrationRecord } from '../types';
 import { findByCode } from '../services/registrationService';
 import { useTheme } from '../context/ThemeContext';
-import { Search, CheckCircle, XCircle, UserCheck, Ticket, QrCode } from 'lucide-react';
+import { Search, CheckCircle, XCircle, UserCheck, Ticket, Key } from 'lucide-react';
 
 export const BadgeLookup: React.FC = () => {
   const { theme, config } = useTheme();
@@ -38,11 +38,11 @@ export const BadgeLookup: React.FC = () => {
           className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-xs"
           style={{ backgroundColor: `${config.dotColor}25`, color: config.dotColor }}
         >
-          <QrCode className="w-6 h-6" />
+          <Key className="w-6 h-6" />
         </div>
-        <h2 className="text-xl font-bold">Delegate & Ticket Verification</h2>
+        <h2 className="text-xl font-bold">18 October Pass Verification</h2>
         <p className={`text-xs mt-1 ${config.textMuted}`}>
-          Enter your unique code to view and print your active pass.
+          Enter your unique letter pass code to verify entry for Garba &amp; DJ Night at Gurgaon University.
         </p>
       </div>
 
@@ -52,7 +52,7 @@ export const BadgeLookup: React.FC = () => {
           <input
             id="lookup-code-input"
             type="text"
-            placeholder="e.g. CLT-DEL-26-8942"
+            placeholder="e.g. SNGM-TKT-31958"
             value={code}
             onChange={(e) => setCode(e.target.value)}
             className={`w-full pl-10 pr-4 py-2.5 rounded-xl text-sm uppercase font-mono outline-hidden border transition ${config.inputBg}`}

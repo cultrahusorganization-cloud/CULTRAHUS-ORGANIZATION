@@ -4,77 +4,37 @@ export interface FestivalPillar {
   tagline: string;
   description: string;
   color: string;
+  iconName?: string;
 }
 
 export const FESTIVAL_PILLARS: FestivalPillar[] = [
   {
-    title: "Theatre & Nukkad Natak",
-    badge: "Flagship Conclave",
-    tagline: "Proscenium Grandeur & Street Voices",
-    description: "From introspective proscenium productions with intricate lighting cues to raw, pulse-pounding street plays in the open amphitheatre.",
-    color: "border-[#5b6e41]/40 bg-[#ebf0e2]/60"
-  },
-  {
-    title: "Indian Dance Assemblies",
-    badge: "Heritage & Modern",
-    tagline: "Kathak, Odissi, Bharatnatyam & Fusion",
-    description: "Expressive mudras, rigorous footwork, and contemporary physical theatre celebrating timeless aesthetic rasas.",
-    color: "border-[#708051]/40 bg-[#f4efe4]/80"
-  },
-  {
-    title: "Live Music Bands & Fusion",
-    badge: "Acoustic & Electric",
-    tagline: "Sufi, Folk Rock & Hindustani Grooves",
-    description: "High-octane collegiate and professional ensembles uniting sarangi, electric bass, dholak, and soul-stirring vocal melodies.",
-    color: "border-[#5b6e41]/35 bg-[#e8ede0]/60"
-  },
-  {
-    title: "Dandiya & Garba Raas",
-    badge: "Cultural Festive",
-    tagline: "Traditional Rhythms & Community Circles",
-    description: "An open-air evening extravaganza of traditional dhol rhythms, authentic choreography, and colorful festive attire.",
+    title: "Grand Garba & Dandiya Raas",
+    badge: "Traditional Extravaganza",
+    tagline: "Authentic Folk Dhol & Community Circles",
+    description: "Open-air energetic Garba Raas featuring live Gujarati percussionists, authentic dholak beats, traditional choreography, and non-stop dancing circles under festive illumination.",
     color: "border-[#c59a3f]/40 bg-[#faf6eb]"
   },
   {
-    title: "Celebrity Guest DJ & EDM",
-    badge: "Youth Euphoria",
-    tagline: "Electronic Sangeet & Soundscapes",
-    description: "Grand festival finale bringing youth energy with headliner festival remixes, bass drops, and visual stage projections.",
+    title: "Celebrity Guest DJ Night",
+    badge: "Electronic Sangeet Finale",
+    tagline: "Bass Drops, Concert Lasers & EDM Beats",
+    description: "Youth dance explosion headlined by celebrity guest DJ spinning festival remixes, Punjabi-Bollywood bangers, pulsating bass drops, and dynamic concert visual projections.",
     color: "border-[#43522e]/40 bg-[#e2ead7]/60"
-  }
-];
-
-export interface Dignitary {
-  name: string;
-  role: string;
-  title: string;
-  image: string;
-}
-
-export const DIGNITARIES: Dignitary[] = [
-  {
-    name: "Prof. Virendra N. Kaul",
-    role: "Festival Chairman & Senior Dramaturge",
-    title: "Former Dean, National School of Drama, New Delhi",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80"
   },
   {
-    name: "Padmashri Smt. Meenakshi Sanyal",
-    role: "Dean of Performing Arts & Classical Choreography",
-    title: "Distinguished Fellow, Sangeet Natak Akademi",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&auto=format&fit=crop&q=80"
+    title: "Concert Stage & Light Spectacle",
+    badge: "Audiovisual Production",
+    tagline: "Laser Beams, Smoke Cannons & Sound Systems",
+    description: "State-of-the-art pro sound line arrays, sweeping multi-color beam lights, CO2 blasters, and immersive atmospheric stagecraft inside the Gurgaon University amphitheatre.",
+    color: "border-[#5b6e41]/35 bg-[#e8ede0]/60"
   },
   {
-    name: "Dr. Harshavardhan Trivedi",
-    role: "Chairperson, Cultural Parliament & Policy Forum",
-    title: 'Author of "The Theatre of the Indian Republic"',
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&auto=format&fit=crop&q=80"
-  },
-  {
-    name: "Rituja Sen Choudhury",
-    role: "Convenor, Secretariat & Youth Council",
-    title: "Founder, Cultrahus Heritage & Arts Initiative",
-    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&auto=format&fit=crop&q=80"
+    title: "Food & Refreshment Promenade",
+    badge: "Festive Delicacies",
+    tagline: "Chaat, Mocktails & Street Snacks",
+    description: "Curated student-friendly food court with authentic festive treats, coolers, energy drinks, and gourmet evening snacks to keep your dance energy peaking all night.",
+    color: "border-[#708051]/40 bg-[#f4efe4]/80"
   }
 ];
 
@@ -88,51 +48,34 @@ export interface FAQItem {
 export const FESTIVAL_FAQS: FAQItem[] = [
   {
     id: "faq-1",
-    category: "Registration",
-    question: "What is included in the ₹650 Accredited Delegate Pass?",
-    answer: "The ₹650 Delegate Accreditation grants you all-day VIP access across all 5 festival stages and performance halls, an official Delegate Kit with the 2026 Conclave Monograph, voting rights in the Cultural Parliament session, and an authenticated digital certificate of representation."
+    category: "Tickets",
+    question: "What passes are available for 18 October?",
+    answer: "There are only two official passes: ₹250 for Single Person Entry and ₹450 for Couple Entry. Both passes grant complete, all-access entry to both Garba Night and the Celebrity DJ Night on 18 October 2026 at Gurgaon University."
   },
   {
     id: "faq-2",
-    category: "Tickets",
-    question: "How do Conclave Ticket passes differ between the 2-Day Pass and Single-Day Pass?",
-    answer: "Limited Time Offer: Ticket prices are cut down to special festive rates! The 2-Day Pass is now just ₹700 (cut down from ₹1,000) with Both Days Included (Day 1: Dance Competition, Music Competition, Singers’ Performance and Big Programme; Day 2: Garba Night, Dandiya Night and DJ Night). The Single-Day Pass is now ₹400 (cut down from ₹600) for your chosen day (Day 1 or Day 2). Both passes include instant authenticated digital passes and QR codes!"
+    category: "Venue",
+    question: "Where is the event taking place on 18 October?",
+    answer: "The event is hosted at Gurgaon University Campus (Sector 51, Gurugram, Haryana). Entry will be managed via Main Gate 1 with rapid security pass verification."
   },
   {
     id: "faq-3",
-    category: "Participation",
-    question: "How are theatre troupes and street plays selected?",
-    answer: "Troupes submit their play details, synopsis, and technical riders via the Troupe Registration portal. Our jury panel curates 16 proscenium productions and 24 street play finalists. All selected troupes receive official letters of invitation."
+    category: "Inclusions",
+    question: "Do the passes include both Garba Night and DJ Night?",
+    answer: "Yes, both the ₹250 Single Person Pass and ₹450 Couple Pass grant complete access to both Grand Garba Raas and the Celebrity DJ Night at Gurgaon University."
   },
   {
     id: "faq-4",
-    category: "Venue",
-    question: "Where is Cultrahus Sangam 2026 taking place, and how do I reach it?",
-    answer: "Venue: TBA (To Be Announced). The official venue for Cultrahus Sangam 2026 is currently being finalized and will be announced shortly (TBA) to accommodate 1,200+ delegates, proscenium theatre stages, and cultural pavilions. All confirmed delegates, collegiate troupes, and ticket holders will receive exact location coordinates, gate access passes, and transit guidelines via WhatsApp and registered Email as soon as announced."
+    category: "Verification",
+    question: "How do I look up and verify my booked pass?",
+    answer: "You can use the 'Lookup Pass' feature right on the website. Simply enter your Unique Letter Security Code (e.g. SNGM-TKT-XXXXX) or registered 10-digit WhatsApp number to instantly verify your pass, see confirmation details, and view or print your digital pass credential."
   },
   {
     id: "faq-5",
-    category: "Registration",
-    question: "What happens immediately after I submit my delegate or ticket form?",
-    answer: "You will receive an instant official reference code (e.g. SNGM-DEL-XXXXX or SNGM-TKT-XXXXX) along with a verifiable digital pass preview containing a secure QR code and audit metadata. You can save, print, or download your pass immediately."
+    category: "Entry Rules",
+    question: "Do I need a QR code for entry?",
+    answer: "No QR code is needed! You only need your Unique Letter Security Code (e.g. SNGM-TKT-XXXXX) and registered name. Present your digital pass or unique letter code at the Gurgaon University security checkpoint for instant RFID wristband issuance."
   }
-];
-
-export const PARLIAMENT_TRACKS = [
-  "Youth & Performing Arts National Policy",
-  "Theatre as Democratic Dialogue & Free Speech",
-  "Preserving Regional Folk Traditions in Modern Times",
-  "Public Funding, Copyrights & Artist Welfare"
-];
-
-export const PARTICIPATION_CATEGORIES = [
-  "Solo Dance",
-  "Stage Play (Proscenium)",
-  "Street Play (Nukkad Natak)",
-  "Classical Vocal / Instrumental",
-  "Contemporary Physical Theatre",
-  "Academic Scholar / Dramaturgy Observer",
-  "Student Youth Delegate"
 ];
 
 export interface DaySchedule {
@@ -145,29 +88,18 @@ export interface DaySchedule {
 export const SANGAM_SCHEDULE: DaySchedule[] = [
   {
     dayNumber: 1,
-    dayLabel: 'DAY 1',
-    tagline: 'Competitions & Grand Cultural Showcase',
+    dayLabel: '18 OCTOBER 2026',
+    tagline: 'Garba Night & Celebrity DJ Night at Gurgaon University',
     events: [
-      'Dance Competition',
-      'Music Competition',
-      "Singers’ Performance",
-      'Big Programme'
-    ]
-  },
-  {
-    dayNumber: 2,
-    dayLabel: 'DAY 2',
-    tagline: 'Folk Heritage & Electronic Euphoria',
-    events: [
-      'Garba Night',
-      'Dandiya Night',
-      'DJ Night'
+      'Traditional Festive Welcome',
+      'Grand Garba & Dandiya Raas',
+      'Celebrity DJ Night & EDM Euphoria'
     ]
   }
 ];
 
 export interface TicketTier {
-  id: 'two_day' | 'single_day' | string;
+  id: 'single_person' | 'couple' | string;
   name: string;
   price: number;
   originalPrice?: number;
@@ -176,43 +108,49 @@ export interface TicketTier {
   food: string;
   badge?: string;
   popular?: boolean;
-  daysIncludedText?: string;
+  entryType?: 'single' | 'couple';
+  inclusions?: string;
 }
 
 export const TICKET_TIERS: TicketTier[] = [
   {
-    id: 'two_day',
-    name: '2-Day Pass',
-    price: 700,
-    originalPrice: 1000,
-    popular: true,
-    badge: 'Limited Time Offer',
-    daysIncludedText: '✓ Both Days Included',
-    description: 'Limited Time Offer: Price cut from ₹1,000 to ₹700! Entry on Day 1 AND Day 2.',
+    id: 'single_person',
+    name: 'Single Person Entry',
+    price: 250,
+    badge: 'Single Person Pass',
+    entryType: 'single',
+    description: 'Entry pass for 1 person on 18 October at Gurgaon University. Includes complete access to Garba Night and DJ Night celebrations.',
     features: [
-      'Entry on Day 1 AND Day 2',
-      'Day 1: Dance Competition, Music Competition, Singers’ Performance and Big Programme',
-      'Day 2: Garba Night, Dandiya Night and DJ Night',
-      '✓ Both Days Included'
+      'Entry for 1 Person (Single Entry)',
+      'Grand Garba Night & Dandiya Access',
+      'Celebrity DJ Night & EDM Finale Access',
+      'Unique Letter Security Code (No QR Code Needed)',
+      'Instant Pass Lookup & Mobile Access'
     ],
-    food: 'Full 2-Day Festival Access'
+    inclusions: 'Garba Night & DJ Night Included',
+    food: 'Full Event Entry (1 Person)'
   },
   {
-    id: 'single_day',
-    name: 'Single-Day Pass',
-    price: 400,
-    originalPrice: 600,
-    badge: 'Limited Time Offer',
-    daysIncludedText: 'Customer can select either Day 1 OR Day 2',
-    description: 'Limited Time Offer: Price cut from ₹600 to ₹400! Select either Day 1 OR Day 2.',
+    id: 'couple',
+    name: 'Couple Entry',
+    price: 450,
+    popular: true,
+    badge: 'Couple Pass (2 Persons)',
+    entryType: 'couple',
+    description: 'Entry pass for Couple (2 persons) on 18 October at Gurgaon University. Includes complete access to Garba Night and DJ Night celebrations for both.',
     features: [
-      'Customer can select either Day 1 OR Day 2',
-      'If Day 1 is selected: Dance Competition, Music Competition, Singers’ Performance and Big Programme',
-      'If Day 2 is selected: Garba Night, Dandiya Night and DJ Night'
+      'Entry for Couple (2 Persons Entry)',
+      'Grand Garba Night Access (For Both)',
+      'Celebrity DJ Night Access (For Both)',
+      'Unique Letter Security Code (No QR Code Needed)',
+      'Instant Pass Lookup & Mobile Access'
     ],
-    food: 'Single Day Festival Access'
+    inclusions: 'Garba Night & DJ Night Included for Couple',
+    food: 'Full Event Entry (2 Persons)'
   }
 ];
+
+export const SCHEDULE_TIMELINE: { title: string; venue: string; description: string; time?: string }[] = [];
 
 export interface SecretariatDept {
   id: string;
@@ -276,7 +214,7 @@ export const SPONSOR_TIERS: SponsorTier[] = [
       "Brand logo on select event collateral and communication materials",
       "Mention in official digital circulars & souvenir dossier",
       "Social media acknowledgment across festival handles",
-      "2 Complimentary VIP Access Passes to all theatrical showcases",
+      "2 Complimentary VIP Access Passes to Garba & DJ Night",
       "Official Certificate of Cultural Patronage"
     ]
   },
@@ -309,10 +247,10 @@ export const SPONSOR_TIERS: SponsorTier[] = [
     colorBorder: "border-[#94a3b8]",
     colorAccent: "text-[#334155]",
     features: [
-      "Prominent logo placement on main auditorium proscenium wings & banners",
+      "Prominent logo placement on main concert stage wings & banners",
       "Premium exhibition & experiential engagement space at entrance foyer",
-      "Verbal acknowledgments by festival anchors before headline theatricals",
-      "Co-branded stage track association (e.g., Nukkad or Classical Track)",
+      "Verbal acknowledgments by festival anchors before headline DJ show",
+      "Co-branded stage track association",
       "8 Complimentary All-Access VIP Passes & Delegate kits",
       "Dedicated digital push with product/brand integration reel"
     ]
@@ -322,104 +260,31 @@ export const SPONSOR_TIERS: SponsorTier[] = [
     amount: 100000,
     rateLabel: "₹1,00,000",
     name: "Presenting Partner",
-    headline: "Headline title association: Own the spotlight and lead the national conclave.",
+    headline: "Headline title association: Own the spotlight and lead the celebration.",
     badge: "Exclusive Title",
     isPopular: true,
     colorBg: "bg-[#fdfbf6]",
     colorBorder: "border-[#3b4928]",
     colorAccent: "text-[#3b4928]",
     features: [
-      'Headline Title: "Cultrahus Sangam 2026 Presented by [Your Brand]"',
-      "Largest logo prominence on main auditorium backdrop & outdoor arches",
+      'Headline Title: "Cultrahus Sangam Presented by [Your Brand]"',
+      "Largest logo prominence on main concert backdrop & outdoor arches",
       "Prime large-format experiential activation pavilion at festival grounds",
-      "Keynote / Guest of Honour slot during National Conclave Valedictory Ceremony",
-      "Broadcast of 60-second corporate film inside main auditorium before headline shows",
+      "Keynote / Guest of Honour slot during Grand Opening Ceremony",
       "15 Complimentary Sovereign VIP Passes + Royal Banquet Hospitality",
-      "Exclusive press kit quote and premier listing across national media dispatches"
+      "Exclusive press kit quote and premier listing across social channels"
     ]
   }
 ];
 
-export const GALLERY_ITEMS = [
-  {
-    id: 1,
-    title: "Proscenium Lighting & Climax Monologue",
-    category: "Theatre",
-    url: "https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?w=800&auto=format&fit=crop&q=80"
-  },
-  {
-    id: 2,
-    title: "Street Theatre (Nukkad) High-Decibel Circle",
-    category: "Street Play",
-    url: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&auto=format&fit=crop&q=80"
-  },
-  {
-    id: 3,
-    title: "Classical Kathak Rhythm & Mudra Ensemble",
-    category: "Dance",
-    url: "https://images.unsplash.com/photo-1518834107812-67b0b7c58434?w=800&auto=format&fit=crop&q=80"
-  },
-  {
-    id: 4,
-    title: "Youth Cultural Parliament Plenary Hall",
-    category: "Parliament",
-    url: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop&q=80"
-  },
-  {
-    id: 5,
-    title: "Indie Folk Fusion Percussion Live",
-    category: "Music",
-    url: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=800&auto=format&fit=crop&q=80"
-  },
-  {
-    id: 6,
-    title: "Grand Evening Garba & Dandiya Under Lights",
-    category: "Dandiya & Finale",
-    url: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop&q=80"
-  }
+export const PARLIAMENT_TRACKS = [
+  "Garba Folk Traditions & Performing Arts",
+  "Modern Youth Cultural Festivities",
+  "Campus Arts Coordination & Logistics"
 ];
 
-export const SCHEDULE_TIMELINE = [
-  {
-    time: "10:00 AM - 11:30 AM",
-    title: "Inaugural Ceremony & National Natya Vandana",
-    venue: "Main Proscenium Hall",
-    description: "Lamp lighting with Padmashri Smt. Meenakshi Sanyal and address by Festival Chairman Prof. Virendra N. Kaul."
-  },
-  {
-    time: "11:45 AM - 02:00 PM",
-    title: "National Street Play Championship (Nukkad Natak Prelims)",
-    venue: "Meghdoot Open Amphitheatre",
-    description: "16 selected collegiate squads presenting socio-political and contemporary dramatizations."
-  },
-  {
-    time: "02:00 PM - 03:00 PM",
-    title: "High-Tea Networking & Sovereign Banquet",
-    venue: "Delegates Dining Enclosure",
-    description: "Artistic exchanges, director roundtables, and delegate lunch service."
-  },
-  {
-    time: "03:15 PM - 05:30 PM",
-    title: "National Youth Cultural Parliament (Plenary Debate)",
-    venue: "Cultural Senate Chamber",
-    description: "Deliberations on National Performing Arts Policy with voting by accredited delegates."
-  },
-  {
-    time: "05:45 PM - 08:15 PM",
-    title: "Curated Proscenium Stage Dramas (Finals)",
-    venue: "Main Proscenium Hall",
-    description: "Flagship theatrical performances with full stagecraft, lighting, and live score."
-  },
-  {
-    time: "08:30 PM - 10:15 PM",
-    title: "Grand Garba & Dandiya Raas Night",
-    venue: "Festive Promenade & Open Courtyard",
-    description: "Authentic Gujarati folk percussionists, live singing, and open-circle Dandiya for all pass holders."
-  },
-  {
-    time: "10:15 PM - Midnight",
-    title: "Celebrity Guest DJ & Sangeet Finale",
-    venue: "Festival Central Stage",
-    description: "Bass-heavy electronic folk remix headliner set celebrating youth and stage camaraderie."
-  }
+export const PARTICIPATION_CATEGORIES = [
+  "Garba Group Entry",
+  "Student Youth Delegate"
 ];
+

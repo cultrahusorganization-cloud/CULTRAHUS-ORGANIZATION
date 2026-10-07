@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Overview } from './components/Overview';
-import { DelegatePass } from './components/DelegatePass';
 import { BookTickets } from './components/BookTickets';
-import { TroupeEntry } from './components/TroupeEntry';
 import { JoinSecretariat } from './components/JoinSecretariat';
 import { SponsorUs } from './components/SponsorUs';
 import { AboutVenue } from './components/AboutVenue';
@@ -27,7 +25,15 @@ export function App() {
     // Hash based routing support
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '').trim();
-      if (['home', 'delegate', 'tickets', 'troupe', 'secretariat', 'sponsor', 'about', 'contact', 'admin'].includes(hash)) {
+      if (hash === 'troupe' || hash === 'delegate') {
+        setActiveTab('tickets');
+        window.location.hash = 'tickets';
+      } else if (hash === 'lookup') {
+        setActiveTab('home');
+        setTimeout(() => {
+          document.getElementById('lookup-section')?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      } else if (['home', 'tickets', 'secretariat', 'sponsor', 'about', 'contact', 'admin'].includes(hash)) {
         setActiveTab(hash);
       }
     };
@@ -49,10 +55,8 @@ export function App() {
 
       {/* Main Content View */}
       <main className="flex-1 w-full max-w-full overflow-x-hidden">
-        {activeTab === 'home' && <Overview setActiveTab={handleTabChange} />}
-        {activeTab === 'delegate' && <DelegatePass onPassGenerated={setDigitalPassData} />}
+        {activeTab === 'home' && <Overview setActiveTab={handleTabChange} onPassGenerated={setDigitalPassData} />}
         {activeTab === 'tickets' && <BookTickets onPassGenerated={setDigitalPassData} />}
-        {activeTab === 'troupe' && <TroupeEntry onPassGenerated={setDigitalPassData} />}
         {activeTab === 'secretariat' && <JoinSecretariat onPassGenerated={setDigitalPassData} />}
         {activeTab === 'sponsor' && <SponsorUs onPassGenerated={setDigitalPassData} />}
         {activeTab === 'about' && <AboutVenue />}

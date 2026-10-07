@@ -246,12 +246,14 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
     let detail2Value: string = record.status || 'Confirmed';
 
     if (cat === 'tickets') {
-      const isTwoDay = record.ticketTier === 'two_day' || record.tierName?.includes('2-Day');
-      title = record.tierName || (isTwoDay ? '2-DAY CONCLAVE PASS (BOTH DAYS)' : 'SINGLE-DAY PASS');
-      detail1Label = 'Pass Tier & Day';
-      detail1Value = `${record.selectedDay || (isTwoDay ? 'Both Days Included' : record.tierName || 'Standard')} (${record.quantity || 1} pass${(record.quantity || 1) > 1 ? 'es' : ''})`;
-      detail2Label = 'Inclusions';
-      detail2Value = record.foodAddon || (isTwoDay ? 'Both Days: Day 1 & Day 2 Full Access' : 'Single Day Access');
+      const isCouple = record.ticketTier === 'couple' || record.tierName?.toLowerCase().includes('couple');
+      title = record.tierName || (isCouple ? 'COUPLE ENTRY PASS (GARBA & DJ NIGHT)' : 'SINGLE PERSON ENTRY PASS (GARBA & DJ NIGHT)');
+      detail1Label = 'Pass Type & Quantity';
+      detail1Value = isCouple 
+        ? `${record.quantity || 1} Couple Pass (${(record.quantity || 1) * 2} Persons)${record.partnerName ? ` • with ${record.partnerName}` : ''}`
+        : `${record.quantity || 1} Single Person Pass`;
+      detail2Label = 'Event Inclusions';
+      detail2Value = record.foodAddon || 'Garba Night & DJ Night Included';
     } else if (cat === 'plays') {
       title = 'OFFICIAL DRAMA TROUPE ENTRY';
       detail1Label = 'Play & Troupe';
@@ -501,25 +503,20 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
       </div>
 
       {/* Real-time Metric Tiles */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
         <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
           <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-[#556345] font-bold truncate">Total Enrolled</div>
           <div className="text-lg sm:text-2xl font-serif font-extrabold text-[#242c18] mt-0.5 sm:mt-1 truncate">{stats.total}</div>
         </div>
 
         <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
-          <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-[#556345] font-bold truncate">Delegates</div>
-          <div className="text-lg sm:text-2xl font-serif font-extrabold text-[#242c18] mt-0.5 sm:mt-1 truncate">{stats.delegates}</div>
-        </div>
-
-        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
-          <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-[#556345] font-bold truncate">Passes</div>
+          <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-[#556345] font-bold truncate">Festive Passes</div>
           <div className="text-lg sm:text-2xl font-serif font-extrabold text-[#242c18] mt-0.5 sm:mt-1 truncate">{stats.tickets}</div>
         </div>
 
         <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
-          <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-[#556345] font-bold truncate">Troupes</div>
-          <div className="text-lg sm:text-2xl font-serif font-extrabold text-[#242c18] mt-0.5 sm:mt-1 truncate">{stats.plays}</div>
+          <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-[#556345] font-bold truncate">Delegates</div>
+          <div className="text-lg sm:text-2xl font-serif font-extrabold text-[#242c18] mt-0.5 sm:mt-1 truncate">{stats.delegates}</div>
         </div>
 
         <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#ede4d2] border border-[#cfc4ad] text-center">
@@ -544,9 +541,8 @@ export const OrganizerPortal: React.FC<OrganizerPortalProps> = ({ onPassGenerate
         <div className="flex items-center gap-1.5 overflow-x-auto pb-2 -mx-1 px-1 sm:mx-0 sm:px-0 sm:flex-wrap sm:pb-0 scrollbar-none w-full md:w-auto">
           {[
             { id: 'all', label: 'All Records', count: stats.total },
-            { id: 'delegates', label: 'Delegates', count: stats.delegates },
             { id: 'tickets', label: 'Passes', count: stats.tickets },
-            { id: 'plays', label: 'Troupes', count: stats.plays },
+            { id: 'delegates', label: 'Delegates', count: stats.delegates },
             { id: 'secretariat', label: 'Secretariat', count: stats.secretariat },
             { id: 'sponsors', label: 'Sponsors', count: stats.sponsors },
             { id: 'inquiries', label: 'Inquiries', count: stats.inquiries },

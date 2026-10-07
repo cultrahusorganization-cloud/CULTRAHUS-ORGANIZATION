@@ -10,12 +10,12 @@ import {
   AlertCircle, 
   CheckCircle2, 
   Calendar,
-  Layers,
-  Music,
-  Radio
+  Users,
+  User,
+  Heart
 } from 'lucide-react';
 import { CultrahusLogo } from './CultrahusLogo';
-import { TICKET_TIERS, SANGAM_SCHEDULE, TicketTier } from '../data/sangamData';
+import { TICKET_TIERS, TicketTier } from '../data/sangamData';
 import { registerParticipant, findByCode } from '../services/registrationService';
 import { DigitalPassData, RegistrationRecord } from '../types';
 
@@ -25,11 +25,11 @@ interface BookTicketsProps {
 
 export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => {
   const [activeTab, setActiveTab] = useState<'book' | 'lookup'>('book');
-  const [selectedTier, setSelectedTier] = useState<string>('two_day');
-  const [selectedDay, setSelectedDay] = useState<'Day 1' | 'Day 2'>('Day 1');
+  const [selectedTier, setSelectedTier] = useState<string>('single_person');
   const [quantity, setQuantity] = useState<number>(1);
   const [formData, setFormData] = useState({
     fullName: '',
+    partnerName: '',
     email: '',
     whatsappPhone: '',
   });
@@ -69,19 +69,13 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
       return;
     }
 
-    const tierDisplayName = selectedTier === 'two_day' 
-      ? '₹700 — 2-Day Pass (Limited Time Offer • Both Days Included)' 
-      : `₹400 — Single-Day Pass (Limited Time Offer • ${selectedDay})`;
+    const tierDisplayName = selectedTier === 'couple' 
+      ? '₹450 — Couple Entry (Garba Night & DJ Night)' 
+      : '₹250 — Single Person Entry (Garba Night & DJ Night)';
 
-    const chosenDayValue = selectedTier === 'two_day'
-      ? 'Both Days (Day 1 & Day 2)'
-      : selectedDay;
-
-    const chosenInclusions = selectedTier === 'two_day'
-      ? 'Entry on Day 1 AND Day 2 (Day 1: Dance Competition, Music Competition, Singers’ Performance and Big Programme; Day 2: Garba Night, Dandiya Night and DJ Night)'
-      : selectedDay === 'Day 1'
-      ? 'Day 1 Entry: Dance Competition, Music Competition, Singers’ Performance and Big Programme'
-      : 'Day 2 Entry: Garba Night, Dandiya Night and DJ Night';
+    const chosenInclusions = selectedTier === 'couple'
+      ? 'Couple Entry (2 Persons): Garba Night and DJ Night Included'
+      : 'Single Person Entry (1 Person): Garba Night and DJ Night Included';
 
     setSubmitting(true);
     try {
@@ -92,7 +86,7 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
         type: 'ticket',
         ticketTier: selectedTier,
         tierName: tierDisplayName,
-        selectedDay: chosenDayValue,
+        partnerName: selectedTier === 'couple' ? formData.partnerName.trim() : '',
         quantity,
         foodAddon: chosenInclusions,
         amountPaid: totalAmount,
@@ -154,24 +148,24 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
 
   const openBadgeModal = () => {
     if (!createdRecord) return;
-    const isTwoDay = createdRecord.ticketTier === 'two_day' || createdRecord.tierName?.includes('2-Day');
-    const dayLabel = createdRecord.selectedDay || (isTwoDay ? 'Both Days' : selectedDay);
+    const isCouple = createdRecord.ticketTier === 'couple' || createdRecord.tierName?.toLowerCase().includes('couple');
+    const passCount = createdRecord.quantity || 1;
 
     onPassGenerated({
       type: 'ticket',
       code: createdRecord.uniqueCode,
-      title: createdRecord.tierName || (isTwoDay ? '₹700 — 2-Day Pass (Both Days Included)' : `₹400 — Single-Day Pass (${dayLabel})`),
-      fullName: createdRecord.name,
+      title: createdRecord.tierName || (isCouple ? '₹450 Couple Entry Pass' : '₹250 Single Person Entry Pass'),
+      fullName: createdRecord.partnerName 
+        ? `${createdRecord.name} & ${createdRecord.partnerName}` 
+        : createdRecord.name,
       email: createdRecord.email,
       phone: createdRecord.phone,
-      detail1Label: 'Pass Quantity & Day',
-      detail1Value: `${createdRecord.quantity || 1} Pass(es) • ${dayLabel}`,
-      detail2Label: 'Festival Inclusions',
-      detail2Value: isTwoDay
-        ? 'Both Days: Day 1 (Dance, Music, Singers, Big Programme) & Day 2 (Garba, Dandiya & DJ Night)'
-        : (dayLabel === 'Day 2' || selectedDay === 'Day 2')
-        ? 'Day 2: Garba Night, Dandiya Night and DJ Night'
-        : 'Day 1: Dance Competition, Music Competition, Singers’ Performance and Big Programme',
+      detail1Label: 'Pass Type & Persons',
+      detail1Value: isCouple 
+        ? `${passCount} Couple Pass (${passCount * 2} Persons)` 
+        : `${passCount} Single Pass (${passCount} Person)`,
+      detail2Label: 'Event Inclusions',
+      detail2Value: 'Garba Night & DJ Night Included',
       feePaid: `₹${(createdRecord.amountPaid || totalAmount).toLocaleString('en-IN')}`,
       status: 'Confirmed & Validated',
       issuedIst: new Date(createdRecord.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
@@ -184,13 +178,13 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
       <div className="text-center max-w-3xl mx-auto mb-8 flex flex-col items-center">
         <CultrahusLogo size="md" className="mb-3" />
         <span className="text-xs uppercase tracking-widest text-[#5b6e41] font-extrabold block mb-2">
-          Auditorium &amp; Festival Conclave Passes
+          Festive Night Passes
         </span>
         <h1 className="font-serif text-3xl sm:text-5xl font-extrabold text-[#242c18] leading-tight">
-          Book Conclave Passes
+          Book Garba &amp; DJ Night Passes
         </h1>
         <p className="mt-3 text-[#556345] text-sm sm:text-base">
-          Experience the national conclave with full access passes: 2-Day all-access or Single-Day pass with day selection.
+          Choose your entry: <strong className="text-[#242c18]">₹250 Single Person Entry</strong> or <strong className="text-[#242c18]">₹450 Couple Entry</strong>. Both passes include complete access to <strong className="text-[#242c18]">Garba Night &amp; DJ Night</strong>!
         </p>
       </div>
 
@@ -267,7 +261,7 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
         </div>
       )}
 
-      {/* TOP OF THE TICKET SECTION: DAY 1 & DAY 2 SCHEDULE BANNER */}
+      {/* TOP FESTIVAL HIGHLIGHT: GARBA NIGHT & DJ NIGHT IN BOTH */}
       <div className="mb-10 max-w-4xl mx-auto">
         <div className="bg-[#ede4d2] border-2 border-[#cfc4ad] rounded-3xl p-5 sm:p-7 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-5 border-b border-[#cfc4ad] gap-2">
@@ -275,84 +269,67 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
               <Calendar className="w-5 h-5 text-[#5b6e41]" />
               <div>
                 <span className="text-xs uppercase font-extrabold tracking-widest text-[#3b4928] block">
-                  Event Schedule
+                  Event Highlights
                 </span>
                 <h2 className="font-serif font-bold text-xl sm:text-2xl text-[#242c18]">
-                  Cultrahus Sangam 2026 Lineup
+                  Garba Night &amp; DJ Night
                 </h2>
               </div>
             </div>
-            <div className="text-[11px] font-bold text-[#556345] bg-white/70 px-3 py-1 rounded-full border border-[#cfc4ad] self-start sm:self-auto">
-              2 Grand Days of Culture &amp; Celebration
+            <div className="text-[11px] font-bold text-[#3b4928] bg-white/80 px-3 py-1 rounded-full border border-[#cfc4ad] self-start sm:self-auto flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-[#b3832f]" />
+              <span>Included in BOTH Passes</span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            {/* DAY 1 Card */}
-            <div className="p-5 rounded-2xl bg-white/90 border-2 border-[#b8cbb0] shadow-xs flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="inline-block px-3 py-1 rounded-lg bg-[#3b4928] text-[#e5d4aa] text-xs font-extrabold uppercase tracking-wider shadow-xs">
-                    DAY 1
-                  </span>
-                  <span className="text-[11px] font-bold text-[#5b6e41] uppercase tracking-wide">
-                    Stage &amp; Conclave
-                  </span>
-                </div>
-                <div className="font-serif font-bold text-base sm:text-lg text-[#242c18] mb-3 leading-snug">
-                  Dance Competition • Music Competition • Singers’ Performance • Big Programme
-                </div>
-              </div>
-
-              <div className="pt-3 border-t border-[#dfd7c3] space-y-1.5 text-xs text-[#3b4928]">
-                <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#5b6e41]" />
-                  <span className="font-semibold">Dance Competition</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#5b6e41]" />
-                  <span className="font-semibold">Music Competition</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#5b6e41]" />
-                  <span className="font-semibold">Singers’ Performance</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#5b6e41]" />
-                  <span className="font-semibold">Big Programme</span>
-                </div>
-              </div>
-            </div>
-
-            {/* DAY 2 Card */}
+            {/* Garba Night Card */}
             <div className="p-5 rounded-2xl bg-white/90 border-2 border-[#e3cca1] shadow-xs flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <span className="inline-block px-3 py-1 rounded-lg bg-[#b3832f] text-white text-xs font-extrabold uppercase tracking-wider shadow-xs">
-                    DAY 2
+                    GARBA NIGHT
                   </span>
                   <span className="text-[11px] font-bold text-[#b3832f] uppercase tracking-wide">
-                    Festive &amp; DJ Extravaganza
+                    Dandiya Raas
                   </span>
                 </div>
-                <div className="font-serif font-bold text-base sm:text-lg text-[#242c18] mb-3 leading-snug">
-                  Garba Night • Dandiya Night • DJ Night
+                <div className="font-serif font-bold text-base sm:text-lg text-[#242c18] mb-2 leading-snug">
+                  Traditional Rhythms &amp; Dandiya Raas
                 </div>
+                <p className="text-xs text-[#556345] leading-relaxed">
+                  Authentic folk beats, energetic open-air circles, vibrant festive attire, and non-stop celebration for all attendees.
+                </p>
               </div>
 
-              <div className="pt-3 border-t border-[#dfd7c3] space-y-1.5 text-xs text-[#8e6822]">
-                <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#b3832f]" />
-                  <span className="font-semibold">Garba Night</span>
+              <div className="pt-3 mt-4 border-t border-[#dfd7c3] text-[11px] font-bold text-[#8e6822] flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-[#b3832f]" />
+                <span>Full Entry Included in ₹250 &amp; ₹450 Passes</span>
+              </div>
+            </div>
+
+            {/* DJ Night Card */}
+            <div className="p-5 rounded-2xl bg-white/90 border-2 border-[#b8cbb0] shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="inline-block px-3 py-1 rounded-lg bg-[#3b4928] text-[#e5d4aa] text-xs font-extrabold uppercase tracking-wider shadow-xs">
+                    DJ NIGHT
+                  </span>
+                  <span className="text-[11px] font-bold text-[#5b6e41] uppercase tracking-wide">
+                    EDM Finale
+                  </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#b3832f]" />
-                  <span className="font-semibold">Dandiya Night</span>
+                <div className="font-serif font-bold text-base sm:text-lg text-[#242c18] mb-2 leading-snug">
+                  Celebrity DJ &amp; Sound Extravaganza
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#b3832f]" />
-                  <span className="font-semibold">DJ Night</span>
-                </div>
+                <p className="text-xs text-[#556345] leading-relaxed">
+                  High-octane electronic remixes, pulsating bass drops, light shows, and an unforgettable youth festival finale.
+                </p>
+              </div>
+
+              <div className="pt-3 mt-4 border-t border-[#dfd7c3] text-[11px] font-bold text-[#3b4928] flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-[#5b6e41]" />
+                <span>Full Entry Included in ₹250 &amp; ₹450 Passes</span>
               </div>
             </div>
           </div>
@@ -361,99 +338,66 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
 
       {activeTab === 'book' ? (
         <div className="space-y-10">
-          {/* HIGHLIGHTED LIMITED TIME OFFER CALLOUT BANNER */}
-          <div className="max-w-4xl mx-auto">
-            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#fef3c7] via-[#fde68a]/50 to-[#fef3c7] border-2 border-[#b45309] shadow-md flex flex-col md:flex-row items-center justify-between gap-3 text-center md:text-left">
-              <div className="flex items-center gap-3">
-                <span className="px-3.5 py-1.5 rounded-full bg-[#b45309] text-white text-xs font-extrabold uppercase tracking-wider shadow flex items-center gap-1.5 shrink-0 animate-pulse">
-                  <Sparkles className="w-4 h-4 text-[#fde68a]" />
-                  <span>LIMITED TIME OFFER</span>
-                </span>
-                <div>
-                  <h3 className="font-serif font-extrabold text-base sm:text-lg text-[#78350f] leading-tight">
-                    Special Conclave Ticket Prices Slashed!
-                  </h3>
-                  <p className="text-xs text-[#92400e] font-semibold mt-0.5">
-                    Single-Day Pass cut down from <span className="line-through text-[#b45309] font-bold">₹600</span> to <strong className="text-[#78350f] text-sm font-extrabold">₹400</strong> • 2-Day Pass cut down from <span className="line-through text-[#b45309] font-bold">₹1,000</span> to <strong className="text-[#78350f] text-sm font-extrabold">₹700</strong>!
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="px-3.5 py-1.5 bg-[#b45309] text-[#fef3c7] rounded-xl text-xs font-extrabold uppercase tracking-wide shadow-xs border border-[#92400e]">
-                  🔥 Save up to ₹300 per pass
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* 2 Ticket Tier Cards: ₹700 (2-Day Pass) & ₹400 (Single-Day Pass) */}
+          {/* 2 Ticket Options: ₹250 Single Person Entry & ₹450 Couple Entry */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {/* TICKET 1: ₹700 — 2-DAY PASS (CUT FROM ₹1,000) */}
+            {/* TICKET 1: ₹250 — SINGLE PERSON ENTRY */}
             <div
-              id="tier-card-two_day"
-              onClick={() => setSelectedTier('two_day')}
+              id="tier-card-single_person"
+              onClick={() => setSelectedTier('single_person')}
               className={`cursor-pointer rounded-3xl p-6 sm:p-7 border-2 transition-all duration-200 relative flex flex-col justify-between ${
-                selectedTier === 'two_day'
-                  ? 'bg-[#faf7f0] border-[#b45309] shadow-lg ring-2 ring-[#b45309]/20'
+                selectedTier === 'single_person'
+                  ? 'bg-[#faf7f0] border-[#3b4928] shadow-lg ring-2 ring-[#3b4928]/20'
                   : 'bg-[#faf8f5] border-[#cfc4ad] hover:border-[#8e9f73] shadow-xs'
               }`}
             >
-              <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full bg-[#b45309] text-white text-[11px] font-extrabold uppercase tracking-wider shadow flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-[#fde68a]" />
-                <span>LIMITED TIME OFFER • 2-DAY PASS</span>
+              <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full bg-[#3b4928] text-[#e5d4aa] text-[11px] font-extrabold uppercase tracking-wider shadow flex items-center gap-1">
+                <User className="w-3 h-3 text-[#e5d4aa]" />
+                <span>Single Person Entry</span>
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <div>
                     <h3 className="font-serif font-bold text-2xl text-[#242c18]">
-                      2-Day Pass
+                      Single Person Entry
                     </h3>
                     <span className="text-[11px] text-[#556345] font-semibold">
-                      Complete Conclave Experience
+                      Individual Pass (1 Person)
                     </span>
                   </div>
                   <div
                     className={`w-6 h-6 rounded-full border flex items-center justify-center shrink-0 ${
-                      selectedTier === 'two_day'
+                      selectedTier === 'single_person'
                         ? 'bg-[#3b4928] border-[#3b4928] text-white'
                         : 'border-[#b8cbb0] bg-white'
                     }`}
                   >
-                    {selectedTier === 'two_day' && <Check className="w-4 h-4" />}
+                    {selectedTier === 'single_person' && <Check className="w-4 h-4" />}
                   </div>
                 </div>
 
-                {/* Price with Cut */}
-                <div className="flex items-baseline gap-2 mb-1.5">
+                {/* Price Display */}
+                <div className="flex items-baseline gap-2 mb-2">
                   <span className="font-serif font-extrabold text-4xl text-[#242c18]">
-                    ₹700
-                  </span>
-                  <span className="text-base text-[#b45309] line-through font-extrabold">
-                    ₹1,000
+                    ₹250
                   </span>
                   <span className="text-[10px] text-[#556345] uppercase font-bold">
                     / person
                   </span>
                 </div>
 
-                {/* Highlighted Cut Badge */}
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#fef3c7] text-[#92400e] border border-[#fde68a] text-[10px] font-extrabold uppercase tracking-wider mb-3">
-                  <span>⚡ ₹1,000 CUT TO ₹700 • LIMITED TIME OFFER</span>
-                </div>
-
-                {/* Clearly Show: Both Days Included */}
+                {/* Inclusions Pill */}
                 <div className="mb-4 p-3 rounded-2xl bg-[#ebf0e2] border-2 border-[#b8cbb0] text-[#242c18] flex items-center gap-2">
                   <div className="w-5 h-5 rounded-full bg-[#3b4928] text-white flex items-center justify-center shrink-0">
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <span className="font-bold text-xs sm:text-sm text-[#242c18]">
-                    ✓ Both Days Included
+                    ✓ Garba Night &amp; DJ Night Included
                   </span>
                 </div>
 
                 <p className="text-xs text-[#556345] mb-4 leading-relaxed font-medium">
-                  Entry on Day 1 AND Day 2. Unrestricted admission across both festival days.
+                  Entry pass for 1 person including both Garba Night and DJ Night celebrations.
                 </p>
 
                 {/* Inclusions List */}
@@ -465,446 +409,439 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
                   <div className="flex items-start gap-2.5 text-xs text-[#242c18]">
                     <Check className="w-4 h-4 text-[#3b4928] shrink-0 mt-0.5" />
                     <span className="font-semibold">
-                      Entry on Day 1 AND Day 2
+                      Entry for 1 Person (Single Entry)
                     </span>
-                  </div>
-
-                  <div className="flex items-start gap-2.5 text-xs text-[#43522f] pl-1">
-                    <span className="w-2 h-2 rounded-full bg-[#5b6e41] shrink-0 mt-1.5" />
-                    <div>
-                      <strong className="text-[#242c18]">Day 1:</strong> Dance Competition, Music Competition, Singers’ Performance and Big Programme
-                    </div>
                   </div>
 
                   <div className="flex items-start gap-2.5 text-xs text-[#43522f] pl-1">
                     <span className="w-2 h-2 rounded-full bg-[#b3832f] shrink-0 mt-1.5" />
                     <div>
-                      <strong className="text-[#242c18]">Day 2:</strong> Garba Night, Dandiya Night and DJ Night
+                      <strong className="text-[#242c18]">Garba Night:</strong> Complete open-circle Dandiya Raas celebration
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5 text-xs text-[#43522f] pl-1">
+                    <span className="w-2 h-2 rounded-full bg-[#5b6e41] shrink-0 mt-1.5" />
+                    <div>
+                      <strong className="text-[#242c18]">DJ Night:</strong> Celebrity DJ &amp; EDM youth finale
                     </div>
                   </div>
 
                   <div className="flex items-start gap-2.5 text-xs text-[#43522f]">
                     <Check className="w-4 h-4 text-[#3b4928] shrink-0 mt-0.5" />
-                    <span>Official Authenticated Digital Pass with QR Code</span>
-                  </div>
-
-                  <div className="flex items-start gap-2.5 text-xs text-[#43522f]">
-                    <Check className="w-4 h-4 text-[#3b4928] shrink-0 mt-0.5" />
-                    <span>Priority Auditorium &amp; Amphitheatre Entry</span>
+                    <span>Official Authenticated Pass with Unique Security Key Code</span>
                   </div>
                 </div>
               </div>
 
               <div className="mt-6 pt-4 border-t border-[#dfd7c3] flex items-center justify-between text-xs font-bold text-[#3b4928]">
-                <span>Validity: Full 2 Days (Day 1 &amp; Day 2)</span>
+                <span>Valid: 1 Person • Both Events</span>
                 <span className="text-[10px] bg-[#3b4928] text-white px-2 py-0.5 rounded font-mono">
-                  ALL-ACCESS
+                  SINGLE PASS
                 </span>
               </div>
             </div>
 
-            {/* TICKET 2: ₹400 — SINGLE-DAY PASS (CUT FROM ₹600) */}
+            {/* TICKET 2: ₹450 — COUPLE ENTRY */}
             <div
-              id="tier-card-single_day"
-              onClick={() => setSelectedTier('single_day')}
+              id="tier-card-couple"
+              onClick={() => setSelectedTier('couple')}
               className={`cursor-pointer rounded-3xl p-6 sm:p-7 border-2 transition-all duration-200 relative flex flex-col justify-between ${
-                selectedTier === 'single_day'
-                  ? 'bg-[#faf7f0] border-[#b45309] shadow-lg ring-2 ring-[#b45309]/20'
-                  : 'bg-[#faf8f5] border-[#cfc4ad] hover:border-[#8e9f73] shadow-xs'
+                selectedTier === 'couple'
+                  ? 'bg-[#faf7f0] border-[#b3832f] shadow-lg ring-2 ring-[#b3832f]/20'
+                  : 'bg-[#faf8f5] border-[#cfc4ad] hover:border-[#c59a3f] shadow-xs'
               }`}
             >
-              <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full bg-[#b45309] text-white text-[11px] font-extrabold uppercase tracking-wider shadow flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-[#fde68a]" />
-                <span>LIMITED TIME OFFER • SINGLE-DAY</span>
+              <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full bg-[#b3832f] text-white text-[11px] font-extrabold uppercase tracking-wider shadow flex items-center gap-1">
+                <Heart className="w-3 h-3 text-white fill-white" />
+                <span>Couple Entry (2 Persons)</span>
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <div>
                     <h3 className="font-serif font-bold text-2xl text-[#242c18]">
-                      Single-Day Pass
+                      Couple Entry
                     </h3>
                     <span className="text-[11px] text-[#556345] font-semibold">
-                      Customer can select either Day 1 OR Day 2
+                      Couple Pass (Admits 2 Persons)
                     </span>
                   </div>
                   <div
                     className={`w-6 h-6 rounded-full border flex items-center justify-center shrink-0 ${
-                      selectedTier === 'single_day'
-                        ? 'bg-[#3b4928] border-[#3b4928] text-white'
-                        : 'border-[#b8cbb0] bg-white'
+                      selectedTier === 'couple'
+                        ? 'bg-[#b3832f] border-[#b3832f] text-white'
+                        : 'border-[#dfd7c3] bg-white'
                     }`}
                   >
-                    {selectedTier === 'single_day' && <Check className="w-4 h-4" />}
+                    {selectedTier === 'couple' && <Check className="w-4 h-4" />}
                   </div>
                 </div>
 
-                {/* Price with Cut */}
-                <div className="flex items-baseline gap-2 mb-1.5">
+                {/* Price Display */}
+                <div className="flex items-baseline gap-2 mb-2">
                   <span className="font-serif font-extrabold text-4xl text-[#242c18]">
-                    ₹400
-                  </span>
-                  <span className="text-base text-[#b45309] line-through font-extrabold">
-                    ₹600
+                    ₹450
                   </span>
                   <span className="text-[10px] text-[#556345] uppercase font-bold">
-                    / person
+                    / couple
                   </span>
                 </div>
 
-                {/* Highlighted Cut Badge */}
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#fef3c7] text-[#92400e] border border-[#fde68a] text-[10px] font-extrabold uppercase tracking-wider mb-3">
-                  <span>⚡ ₹600 CUT TO ₹400 • LIMITED TIME OFFER</span>
-                </div>
-
-                {/* CLEAR SELECTION OPTION: ○ Day 1  ○ Day 2 */}
-                <div className="mb-4 p-3.5 rounded-2xl bg-white border-2 border-[#cfc4ad] space-y-2">
-                  <div className="flex items-center justify-between text-[11px] font-extrabold uppercase tracking-wider text-[#384626]">
-                    <span>Select Day:</span>
-                    <span className="text-[10px] text-[#5b6e41] font-bold">Required Choice</span>
+                {/* Inclusions Pill */}
+                <div className="mb-4 p-3 rounded-2xl bg-[#faf6eb] border-2 border-[#e3cca1] text-[#242c18] flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-[#b3832f] text-white flex items-center justify-center shrink-0">
+                    <Check className="w-3.5 h-3.5" />
                   </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    {/* Day 1 Option */}
-                    <button
-                      type="button"
-                      id="card-select-day-1"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedTier('single_day');
-                        setSelectedDay('Day 1');
-                      }}
-                      className={`p-2.5 rounded-xl text-left border-2 transition-all flex items-center gap-2 cursor-pointer ${
-                        selectedDay === 'Day 1'
-                          ? 'bg-[#3b4928] text-white border-[#3b4928] shadow-sm'
-                          : 'bg-[#faf8f5] text-[#242c18] border-[#cfc4ad] hover:border-[#8e9f73]'
-                      }`}
-                    >
-                      <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                        selectedDay === 'Day 1'
-                          ? 'border-white bg-white text-[#3b4928]'
-                          : 'border-[#71825e] bg-white'
-                      }`}>
-                        {selectedDay === 'Day 1' && (
-                          <span className="w-2 h-2 rounded-full bg-[#3b4928]" />
-                        )}
-                      </span>
-                      <div className="min-w-0">
-                        <div className="text-xs font-extrabold">○ Day 1</div>
-                        <div className={`text-[10px] truncate ${selectedDay === 'Day 1' ? 'text-[#e5d4aa]' : 'text-[#607147]'}`}>
-                          Competitions &amp; Show
-                        </div>
-                      </div>
-                    </button>
-
-                    {/* Day 2 Option */}
-                    <button
-                      type="button"
-                      id="card-select-day-2"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedTier('single_day');
-                        setSelectedDay('Day 2');
-                      }}
-                      className={`p-2.5 rounded-xl text-left border-2 transition-all flex items-center gap-2 cursor-pointer ${
-                        selectedDay === 'Day 2'
-                          ? 'bg-[#3b4928] text-white border-[#3b4928] shadow-sm'
-                          : 'bg-[#faf8f5] text-[#242c18] border-[#cfc4ad] hover:border-[#8e9f73]'
-                      }`}
-                    >
-                      <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                        selectedDay === 'Day 2'
-                          ? 'border-white bg-white text-[#3b4928]'
-                          : 'border-[#71825e] bg-white'
-                      }`}>
-                        {selectedDay === 'Day 2' && (
-                          <span className="w-2 h-2 rounded-full bg-[#3b4928]" />
-                        )}
-                      </span>
-                      <div className="min-w-0">
-                        <div className="text-xs font-extrabold">○ Day 2</div>
-                        <div className={`text-[10px] truncate ${selectedDay === 'Day 2' ? 'text-[#e5d4aa]' : 'text-[#607147]'}`}>
-                          Garba &amp; DJ Night
-                        </div>
-                      </div>
-                    </button>
-                  </div>
+                  <span className="font-bold text-xs sm:text-sm text-[#242c18]">
+                    ✓ Garba Night &amp; DJ Night Included (For 2 Persons)
+                  </span>
                 </div>
 
                 <p className="text-xs text-[#556345] mb-4 leading-relaxed font-medium">
-                  Customer can select either Day 1 OR Day 2. Pass is authenticated for entry on the chosen day.
+                  Entry pass for Couple (2 persons) including both Garba Night and DJ Night celebrations for both.
                 </p>
 
-                {/* Inclusions List for Single-Day Pass */}
+                {/* Inclusions List */}
                 <div className="pt-4 border-t border-[#dfd7c3] space-y-3">
                   <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#43522f]">
                     Includes:
                   </div>
 
                   <div className="flex items-start gap-2.5 text-xs text-[#242c18]">
-                    <Check className="w-4 h-4 text-[#3b4928] shrink-0 mt-0.5" />
+                    <Check className="w-4 h-4 text-[#b3832f] shrink-0 mt-0.5" />
                     <span className="font-semibold">
-                      Customer can select either Day 1 OR Day 2
+                      Entry for Couple (2 Persons Entry)
                     </span>
                   </div>
 
-                  <div className={`p-2.5 rounded-xl border transition-all ${
-                    selectedDay === 'Day 1'
-                      ? 'bg-[#ebf0e2] border-[#b8cbb0] text-[#242c18] font-bold'
-                      : 'bg-[#faf8f5] border-transparent text-[#607147]'
-                  }`}>
-                    <div className="flex items-start gap-2 text-xs">
-                      <span className="w-2 h-2 rounded-full bg-[#5b6e41] shrink-0 mt-1" />
-                      <div>
-                        <strong>If Day 1 is selected:</strong> Dance Competition, Music Competition, Singers’ Performance and Big Programme.
-                      </div>
+                  <div className="flex items-start gap-2.5 text-xs text-[#43522f] pl-1">
+                    <span className="w-2 h-2 rounded-full bg-[#b3832f] shrink-0 mt-1.5" />
+                    <div>
+                      <strong className="text-[#242c18]">Garba Night:</strong> Full admission for both persons
                     </div>
                   </div>
 
-                  <div className={`p-2.5 rounded-xl border transition-all ${
-                    selectedDay === 'Day 2'
-                      ? 'bg-[#fbf4e4] border-[#e3cca1] text-[#242c18] font-bold'
-                      : 'bg-[#faf8f5] border-transparent text-[#607147]'
-                  }`}>
-                    <div className="flex items-start gap-2 text-xs">
-                      <span className="w-2 h-2 rounded-full bg-[#b3832f] shrink-0 mt-1" />
-                      <div>
-                        <strong>If Day 2 is selected:</strong> Garba Night, Dandiya Night and DJ Night.
-                      </div>
+                  <div className="flex items-start gap-2.5 text-xs text-[#43522f] pl-1">
+                    <span className="w-2 h-2 rounded-full bg-[#5b6e41] shrink-0 mt-1.5" />
+                    <div>
+                      <strong className="text-[#242c18]">DJ Night:</strong> Full admission for both persons
                     </div>
                   </div>
 
                   <div className="flex items-start gap-2.5 text-xs text-[#43522f]">
-                    <Check className="w-4 h-4 text-[#3b4928] shrink-0 mt-0.5" />
-                    <span>Official Authenticated Digital Pass with QR Code</span>
+                    <Check className="w-4 h-4 text-[#b3832f] shrink-0 mt-0.5" />
+                    <span>Official Authenticated Pass with Unique Security Key Code</span>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-[#dfd7c3] flex items-center justify-between text-xs font-bold text-[#3b4928]">
-                <span>Currently Selected: {selectedDay}</span>
-                <span className="text-[10px] bg-[#627349] text-white px-2 py-0.5 rounded font-mono">
-                  SINGLE DAY
+              <div className="mt-6 pt-4 border-t border-[#dfd7c3] flex items-center justify-between text-xs font-bold text-[#b3832f]">
+                <span>Valid: Couple (2 Persons) • Both Events</span>
+                <span className="text-[10px] bg-[#b3832f] text-white px-2 py-0.5 rounded font-mono">
+                  COUPLE PASS
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Booking & Personal Details Form */}
-          <div className="bg-[#faf8f5] border-2 border-[#cfc4ad] rounded-3xl p-6 sm:p-10 shadow-sm max-w-2xl mx-auto">
-            <h2 className="font-serif font-bold text-2xl text-[#242c18] mb-1">
-              Pass Holder Information
-            </h2>
-            <p className="text-xs text-[#556345] mb-6 flex flex-wrap items-center gap-2">
-              <span>Selected:</span>
-              <strong className="text-[#242c18]">
-                {selectedTier === 'two_day' ? '₹700 — 2-Day Pass (Both Days Included)' : `₹400 — Single-Day Pass (${selectedDay})`}
-              </strong>
-              <span className="px-2 py-0.5 rounded bg-[#fef3c7] text-[#92400e] border border-[#fde68a] text-[10px] font-extrabold uppercase tracking-wider">
-                Limited Time Offer
-              </span>
-            </p>
+          {/* Booking & Personal Details Form with Live Pass Preview */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-5xl mx-auto items-start">
+            
+            {/* Form Column */}
+            <div className="lg:col-span-7 bg-[#faf8f5] border-2 border-[#dfd7c3] rounded-3xl p-6 sm:p-9 shadow-sm">
+              <h2 className="font-serif font-bold text-2xl text-[#1b2413] mb-1">
+                Pass Holder Information
+              </h2>
+              <p className="text-xs text-[#556345] mb-6 flex flex-wrap items-center gap-2">
+                <span>Selected:</span>
+                <strong className="text-[#1b2413]">
+                  {selectedTier === 'couple' ? '₹450 — Couple Entry (2 Persons)' : '₹250 — Single Person Entry (1 Person)'}
+                </strong>
+                <span className="px-2 py-0.5 rounded bg-[#ebf0e2] text-[#2c3d1d] border border-[#c4d2b5] text-[10px] font-extrabold uppercase tracking-wider">
+                  Garba &amp; DJ Night Included
+                </span>
+              </p>
 
-            {errorMsg && (
-              <div className="mb-6 p-4 rounded-xl bg-[#fde8e8] border border-[#f8b4b4] text-[#9b1c1c] text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{errorMsg}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Day Selection in Form (Required for ₹600 Pass) */}
-              {selectedTier === 'single_day' ? (
-                <div className="p-4 rounded-2xl bg-[#ede4d2] border border-[#dfd7c3]">
-                  <label className="block text-xs font-extrabold uppercase tracking-wider text-[#384626] mb-2">
-                    Select Your Single-Day Pass Date: *
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <label
-                      id="form-radio-day-1"
-                      onClick={() => setSelectedDay('Day 1')}
-                      className={`p-3 rounded-xl border-2 flex items-start gap-3 cursor-pointer transition-all ${
-                        selectedDay === 'Day 1'
-                          ? 'bg-[#3b4928] text-white border-[#3b4928] shadow-sm'
-                          : 'bg-white text-[#242c18] border-[#cfc4ad] hover:border-[#8e9f73]'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="passDay"
-                        value="Day 1"
-                        checked={selectedDay === 'Day 1'}
-                        onChange={() => setSelectedDay('Day 1')}
-                        className="mt-1"
-                      />
-                      <div className="text-xs">
-                        <div className="font-extrabold">○ Day 1</div>
-                        <div className={`text-[11px] mt-0.5 ${selectedDay === 'Day 1' ? 'text-[#e5d4aa]' : 'text-[#556345]'}`}>
-                          Dance Competition, Music Competition, Singers’ Performance &amp; Big Programme
-                        </div>
-                      </div>
-                    </label>
-
-                    <label
-                      id="form-radio-day-2"
-                      onClick={() => setSelectedDay('Day 2')}
-                      className={`p-3 rounded-xl border-2 flex items-start gap-3 cursor-pointer transition-all ${
-                        selectedDay === 'Day 2'
-                          ? 'bg-[#3b4928] text-white border-[#3b4928] shadow-sm'
-                          : 'bg-white text-[#242c18] border-[#cfc4ad] hover:border-[#8e9f73]'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="passDay"
-                        value="Day 2"
-                        checked={selectedDay === 'Day 2'}
-                        onChange={() => setSelectedDay('Day 2')}
-                        className="mt-1"
-                      />
-                      <div className="text-xs">
-                        <div className="font-extrabold">○ Day 2</div>
-                        <div className={`text-[11px] mt-0.5 ${selectedDay === 'Day 2' ? 'text-[#e5d4aa]' : 'text-[#556345]'}`}>
-                          Garba Night, Dandiya Night and DJ Night
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              ) : (
-                <div className="p-4 rounded-2xl bg-[#ebf0e2] border border-[#b8cbb0] text-xs text-[#242c18] flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-[#3b4928] shrink-0" />
-                    <div>
-                      <span className="font-bold text-sm block">✓ Both Days Included</span>
-                      <span className="text-[#556345] text-[11px]">
-                        Grants entry to Day 1 (Competitions &amp; Big Programme) AND Day 2 (Garba, Dandiya &amp; DJ Night).
-                      </span>
-                    </div>
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#3b4928] text-white px-2.5 py-1 rounded-md shrink-0">
-                    Day 1 + Day 2
-                  </span>
+              {errorMsg && (
+                <div className="mb-6 p-4 rounded-xl bg-[#fde8e8] border border-[#f8b4b4] text-[#9b1c1c] text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{errorMsg}</span>
                 </div>
               )}
 
-              {/* Quantity Selector */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#43522f] mb-2">
-                  Number of Passes
-                </label>
-                <div className="flex items-center gap-3">
-                  <div className="inline-flex rounded-xl bg-white border border-[#cfc4ad] p-1">
-                    {[1, 2, 3, 4, 5, 10].map(q => (
-                      <button
-                        key={q}
-                        type="button"
-                        id={`qty-btn-${q}`}
-                        onClick={() => setQuantity(q)}
-                        className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                          quantity === q
-                            ? 'bg-[#3b4928] text-[#f7f4ec]'
-                            : 'text-[#384626] hover:bg-[#eae1cd]'
-                        }`}
-                      >
-                        {q}
-                      </button>
-                    ))}
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {/* Pass Tier Toggle */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#3d5228] mb-2">
+                    Select Ticket Type
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      id="select-single-tier-btn"
+                      onClick={() => setSelectedTier('single_person')}
+                      className={`p-3 rounded-2xl border-2 text-left transition-all flex items-center gap-2.5 cursor-pointer ${
+                        selectedTier === 'single_person'
+                          ? 'bg-[#253319] text-[#fbf8f1] border-[#253319] shadow-sm'
+                          : 'bg-white text-[#242c18] border-[#dfd7c3] hover:border-[#8e9f73]'
+                      }`}
+                    >
+                      <User className="w-4 h-4 shrink-0" />
+                      <div>
+                        <div className="text-xs font-bold">Single Person (₹250)</div>
+                        <div className={`text-[10px] ${selectedTier === 'single_person' ? 'text-[#dfb752]' : 'text-[#607147]'}`}>
+                          Admits 1 Person
+                        </div>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      id="select-couple-tier-btn"
+                      onClick={() => setSelectedTier('couple')}
+                      className={`p-3 rounded-2xl border-2 text-left transition-all flex items-center gap-2.5 cursor-pointer ${
+                        selectedTier === 'couple'
+                          ? 'bg-[#b88a24] text-white border-[#b88a24] shadow-sm'
+                          : 'bg-white text-[#242c18] border-[#dfd7c3] hover:border-[#c99e3a]'
+                      }`}
+                    >
+                      <Heart className="w-4 h-4 shrink-0 fill-current" />
+                      <div>
+                        <div className="text-xs font-bold">Couple Entry (₹450)</div>
+                        <div className={`text-[10px] ${selectedTier === 'couple' ? 'text-white/90' : 'text-[#8e6822]'}`}>
+                          Admits 2 Persons
+                        </div>
+                      </div>
+                    </button>
                   </div>
-                  <span className="text-xs text-[#556345] font-medium">
-                    Total: <strong className="text-base text-[#242c18]">₹{totalAmount.toLocaleString('en-IN')}</strong>
-                  </span>
                 </div>
-              </div>
 
-              {/* Full Name */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#43522f] mb-1.5">
-                  Full Name (Primary Contact) *
-                </label>
-                <input
-                  id="ticket-fullname-input"
-                  type="text"
-                  required
-                  placeholder="e.g. Rohan Verma"
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-white border border-[#cfc4ad] text-sm text-[#242c18] focus:outline-none focus:border-[#3b4928]"
-                />
-              </div>
+                {/* Quantity Selector */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#3d5228] mb-2">
+                    Number of Passes {selectedTier === 'couple' ? '(Each pass admits 1 Couple / 2 Persons)' : '(Each pass admits 1 Person)'}
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <div className="inline-flex rounded-xl bg-white border border-[#dfd7c3] p-1">
+                      {[1, 2, 3, 4, 5, 10].map(q => (
+                        <button
+                          key={q}
+                          type="button"
+                          id={`qty-btn-${q}`}
+                          onClick={() => setQuantity(q)}
+                          className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                            quantity === q
+                              ? selectedTier === 'couple' ? 'bg-[#b88a24] text-white' : 'bg-[#253319] text-[#fbf8f1]'
+                              : 'text-[#384626] hover:bg-[#eae1cd]'
+                          }`}
+                        >
+                          {q}
+                        </button>
+                      ))}
+                    </div>
+                    <span className="text-xs text-[#556345] font-medium">
+                      Total: <strong className="text-base text-[#1b2413]">₹{totalAmount.toLocaleString('en-IN')}</strong>
+                    </span>
+                  </div>
+                </div>
 
-              {/* Email Address */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#43522f] mb-1.5">
-                  Email Address (Pass Delivery) *
-                </label>
-                <input
-                  id="ticket-email-input"
-                  type="email"
-                  required
-                  placeholder="e.g. rohan.verma@gmail.com"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-white border border-[#cfc4ad] text-sm text-[#242c18] focus:outline-none focus:border-[#3b4928]"
-                />
-              </div>
-
-              {/* WhatsApp Phone */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#43522f] mb-1.5">
-                  WhatsApp Phone (10 Digits) *
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-3 text-sm font-mono text-[#71825e]">+91</span>
+                {/* Primary Full Name */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#3d5228] mb-1.5">
+                    Primary Contact Full Name *
+                  </label>
                   <input
-                    id="ticket-phone-input"
-                    type="tel"
+                    id="ticket-fullname-input"
+                    type="text"
                     required
-                    maxLength={10}
-                    placeholder="9876543210"
-                    value={formData.whatsappPhone}
-                    onChange={handlePhoneChange}
-                    className="w-full pl-12 pr-4 py-3 rounded-xl bg-white border border-[#cfc4ad] text-sm text-[#242c18] font-mono focus:outline-none focus:border-[#3b4928]"
+                    placeholder="e.g. Rohan Verma"
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-[#dfd7c3] text-sm text-[#242c18] focus:outline-none focus:border-[#253319]"
                   />
                 </div>
+
+                {/* Partner Name (for Couple Pass) */}
+                {selectedTier === 'couple' && (
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#3d5228] mb-1.5">
+                      Partner / Companion Full Name (Optional)
+                    </label>
+                    <input
+                      id="ticket-partner-input"
+                      type="text"
+                      placeholder="e.g. Ananya Sharma"
+                      value={formData.partnerName}
+                      onChange={(e) => setFormData({ ...formData, partnerName: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl bg-white border border-[#dfd7c3] text-sm text-[#242c18] focus:outline-none focus:border-[#b88a24]"
+                    />
+                    <span className="text-[11px] text-[#556345] mt-1 block">
+                      Will be displayed on the Couple digital pass credential.
+                    </span>
+                  </div>
+                )}
+
+                {/* Email Address */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#3d5228] mb-1.5">
+                    Email Address (Pass Delivery) *
+                  </label>
+                  <input
+                    id="ticket-email-input"
+                    type="email"
+                    required
+                    placeholder="e.g. rohan.verma@gmail.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-[#dfd7c3] text-sm text-[#242c18] focus:outline-none focus:border-[#253319]"
+                  />
+                </div>
+
+                {/* WhatsApp Phone */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#3d5228] mb-1.5">
+                    WhatsApp Phone (10 Digits) *
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-3 text-sm font-mono text-[#71825e]">+91</span>
+                    <input
+                      id="ticket-phone-input"
+                      type="tel"
+                      required
+                      maxLength={10}
+                      placeholder="9876543210"
+                      value={formData.whatsappPhone}
+                      onChange={handlePhoneChange}
+                      className="w-full pl-12 pr-4 py-3 rounded-xl bg-white border border-[#dfd7c3] text-sm text-[#242c18] font-mono focus:outline-none focus:border-[#253319]"
+                    />
+                  </div>
+                </div>
+
+                {/* Inclusions summary banner */}
+                <div className="p-4 rounded-2xl bg-[#ede4d2] border border-[#dfd7c3] text-xs text-[#334423] space-y-1.5">
+                  <div className="font-bold text-[#1b2413] flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-[#b88a24]" />
+                    <span>Garba Night &amp; DJ Night Included Free</span>
+                  </div>
+                  <p className="text-[11px] text-[#556345] leading-relaxed">
+                    Your pass provides full admission to both evening highlights: the traditional Dandiya Raas and the Celebrity DJ EDM Finale.
+                  </p>
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  id="submit-ticket-booking-btn"
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full py-4 rounded-2xl bg-[#253319] hover:bg-[#344723] text-[#fbf8f1] font-bold text-sm shadow-lg shadow-black/10 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {submitting ? (
+                    <span>Processing &amp; Synchronizing to Firestore...</span>
+                  ) : (
+                    <>
+                      <Ticket className="w-4 h-4 text-[#dfb752]" />
+                      <span>Confirm &amp; Book Passes (₹{totalAmount.toLocaleString('en-IN')})</span>
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
+
+            {/* Live Pass Preview Column */}
+            <div className="lg:col-span-5 sticky top-24 space-y-4">
+              <div className="text-[11px] font-extrabold uppercase tracking-widest text-[#705315] flex items-center gap-1.5 px-1">
+                <Sparkles className="w-3.5 h-3.5 text-[#c99e3a]" />
+                <span>Live Digital Pass Preview</span>
               </div>
 
-              {/* Inclusions summary banner */}
-              <div className="p-4 rounded-2xl bg-[#ede4d2] border border-[#dfd7c3] text-xs text-[#3b4928] space-y-1.5">
-                <div className="font-bold text-[#242c18] flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-[#5b6e41]" />
-                  <span>
-                    {selectedTier === 'two_day'
-                      ? '✓ Both Days Included (Day 1 & Day 2)'
-                      : `Selected: Single-Day Pass (${selectedDay})`}
+              {/* The Realistic Pass Card */}
+              <div className="bg-[#fbf9f4] border-2 border-[#dfd4be] rounded-3xl overflow-hidden shadow-lg relative">
+                {/* Gold Top Header Ribbon */}
+                <div className={`p-4 text-center ${selectedTier === 'couple' ? 'bg-[#b88a24]' : 'bg-[#253319]'} text-white`}>
+                  <span className="text-[10px] tracking-widest uppercase font-bold text-[#f7f2e4] block">
+                    Cultrahus Sangam 2026
+                  </span>
+                  <div className="font-serif font-bold text-lg sm:text-xl">
+                    {selectedTier === 'couple' ? '₹450 Couple Entry Pass' : '₹250 Single Person Pass'}
+                  </div>
+                  <span className="text-[10px] text-white/90 font-medium">
+                    {selectedTier === 'couple' ? 'Admits 2 Persons' : 'Admits 1 Person'}
                   </span>
                 </div>
-                <p className="text-[11px] text-[#556345] leading-relaxed">
-                  {selectedTier === 'two_day'
-                    ? 'Grants full admission on Day 1 (Dance Competition, Music Competition, Singers’ Performance & Big Programme) and Day 2 (Garba Night, Dandiya Night & DJ Night).'
-                    : selectedDay === 'Day 1'
-                    ? 'Day 1 Included: Full entry to Dance Competition, Music Competition, Singers’ Performance and Big Programme.'
-                    : 'Day 2 Included: Full entry to Garba Night, Dandiya Night and DJ Night.'}
-                </p>
-              </div>
 
-              {/* Submit Button */}
-              <button
-                id="submit-ticket-booking-btn"
-                type="submit"
-                disabled={submitting}
-                className="w-full py-4 rounded-xl bg-[#3b4928] hover:bg-[#485932] text-[#f7f4ec] font-bold text-sm shadow-lg shadow-black/10 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-              >
-                {submitting ? (
-                  <span>Processing &amp; Synchronizing to Firestore...</span>
-                ) : (
-                  <>
-                    <Ticket className="w-4 h-4 text-[#e5d4aa]" />
-                    <span>Confirm &amp; Book Passes (₹{totalAmount.toLocaleString('en-IN')})</span>
-                  </>
-                )}
-              </button>
-            </form>
+                {/* Notch Holes Simulation */}
+                <div className="relative border-b-2 border-dashed border-[#dfd4be] py-4 px-6 bg-white">
+                  <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#faf7f0] border-r-2 border-[#dfd4be]" />
+                  <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#faf7f0] border-l-2 border-[#dfd4be]" />
+
+                  <div className="text-center space-y-1">
+                    <span className="text-[10px] uppercase font-bold text-[#705315] tracking-wider block">
+                      Pass Holder
+                    </span>
+                    <h4 className="font-serif font-extrabold text-xl text-[#1b2413] truncate">
+                      {formData.fullName.trim() || 'Attendee Name'}
+                    </h4>
+                    {selectedTier === 'couple' && (
+                      <p className="text-xs text-[#b88a24] font-semibold truncate">
+                        &amp; {formData.partnerName.trim() || 'Companion Name'}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Pass Details Body */}
+                <div className="p-5 space-y-3.5 text-xs text-[#242c18] bg-white">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#f0ebd9]">
+                    <span className="text-[#637550] text-[11px]">Pass Quantity:</span>
+                    <span className="font-bold text-[#1b2413]">
+                      {quantity} Pass ({selectedTier === 'couple' ? quantity * 2 : quantity} Persons)
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between pb-2 border-b border-[#f0ebd9]">
+                    <span className="text-[#637550] text-[11px]">Events Included:</span>
+                    <span className="font-bold text-[#334423]">Garba Night &amp; DJ Night</span>
+                  </div>
+
+                  <div className="flex items-center justify-between pb-2 border-b border-[#f0ebd9]">
+                    <span className="text-[#637550] text-[11px]">Total Fee:</span>
+                    <span className="font-mono font-extrabold text-sm text-[#1b2413]">
+                      ₹{totalAmount.toLocaleString('en-IN')}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#637550] text-[11px]">Verification Status:</span>
+                    <span className="px-2 py-0.5 rounded-full bg-[#ebf0e2] text-[#2c3d1d] font-bold text-[10px] uppercase border border-[#b8cbb0]">
+                      Official Pass
+                    </span>
+                  </div>
+
+                  {/* Unique Letter Code Mock graphic */}
+                  <div className="mt-4 pt-4 border-t border-[#f0ebd9] space-y-2">
+                    <div className="flex items-center justify-between text-[10px] text-[#705315] font-bold uppercase tracking-wider">
+                      <span>Unique Security Pass Code</span>
+                      <span className="text-[#334423]">Gate Verified</span>
+                    </div>
+                    <div className="p-3 rounded-xl bg-[#faf7f0] border-2 border-[#c99e3a] text-center shadow-xs">
+                      <div className="font-mono font-black text-base text-[#1b2413] tracking-widest">
+                        SNGM-TKT-XXXXX
+                      </div>
+                      <div className="text-[9px] text-[#71825e] mt-0.5">
+                        Unique alphanumeric code assigned to each attendee
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom Bar */}
+                <div className="p-3 bg-[#f5eee1] text-center border-t border-[#dfd4be] text-[10px] text-[#705315] font-semibold">
+                  Valid for Cultrahus Sangam • 18 Oct 2026 • Gurgaon University
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       ) : (

@@ -7,7 +7,7 @@ import {
   CheckCircle, 
   Copy, 
   Download, 
-  QrCode, 
+  Key, 
   Ticket, 
   UserCheck, 
   Sparkles,
@@ -135,7 +135,7 @@ export const RegistrationForm: React.FC<Props> = ({
         {/* Pass Top Banner */}
         <div className={`p-6 relative overflow-hidden text-white ${theme === 'light' ? 'bg-stone-900' : 'bg-zinc-900/90'}`}>
           <div className="absolute top-0 right-0 p-4 opacity-10">
-            <QrCode className="w-32 h-32" />
+            <Key className="w-32 h-32" />
           </div>
           <div className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase mb-2" style={{ color: config.dotColor }}>
             <Sparkles className="w-4 h-4" /> Registration Confirmed
