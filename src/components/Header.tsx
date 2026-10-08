@@ -58,7 +58,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
     { 
       id: 'tickets', 
       label: 'Book Passes', 
-      desc: 'Garba & DJ Night passes (Single ₹250 / Couple ₹450)',
+      desc: 'Garba & DJ Night passes (Single ₹250 / Couple ₹400)',
       icon: Ticket, 
       badge: 'From ₹250' 
     },

@@ -81,7 +81,7 @@ export const AboutVenue: React.FC = () => {
           </p>
           <div className="text-[11px] font-semibold text-[#3b4928] flex items-center gap-1.5 pt-2 border-t border-[#dfd7c3]">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Single (₹250) &amp; Couple (₹450) Passes</span>
+            <span>Single (₹250) &amp; Couple (₹400) Passes</span>
           </div>
         </div>
       </div>

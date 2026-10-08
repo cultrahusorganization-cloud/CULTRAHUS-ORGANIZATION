@@ -50,7 +50,7 @@ export const FESTIVAL_FAQS: FAQItem[] = [
     id: "faq-1",
     category: "Tickets",
     question: "What passes are available for 18 October?",
-    answer: "There are only two official passes: ₹250 for Single Person Entry and ₹450 for Couple Entry. Both passes grant complete, all-access entry to both Garba Night and the Celebrity DJ Night on 18 October 2026 at Gurgaon University."
+    answer: "There are only two official passes: ₹250 for Single Person Entry and ₹400 for Couple Entry. Both passes grant complete, all-access entry to both Garba Night and the Celebrity DJ Night on 18 October 2026 at Gurgaon University."
   },
   {
     id: "faq-2",
@@ -62,7 +62,7 @@ export const FESTIVAL_FAQS: FAQItem[] = [
     id: "faq-3",
     category: "Inclusions",
     question: "Do the passes include both Garba Night and DJ Night?",
-    answer: "Yes, both the ₹250 Single Person Pass and ₹450 Couple Pass grant complete access to both Grand Garba Raas and the Celebrity DJ Night at Gurgaon University."
+    answer: "Yes, both the ₹250 Single Person Pass and ₹400 Couple Pass grant complete access to both Grand Garba Raas and the Celebrity DJ Night at Gurgaon University."
   },
   {
     id: "faq-4",
@@ -133,7 +133,7 @@ export const TICKET_TIERS: TicketTier[] = [
   {
     id: 'couple',
     name: 'Couple Entry',
-    price: 450,
+    price: 400,
     popular: true,
     badge: 'Couple Pass (2 Persons)',
     entryType: 'couple',

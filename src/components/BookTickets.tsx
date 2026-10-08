@@ -70,7 +70,7 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
     }
 
     const tierDisplayName = selectedTier === 'couple' 
-      ? '₹450 — Couple Entry (Garba Night & DJ Night)' 
+      ? '₹400 — Couple Entry (Garba Night & DJ Night)' 
       : '₹250 — Single Person Entry (Garba Night & DJ Night)';
 
     const chosenInclusions = selectedTier === 'couple'
@@ -154,7 +154,7 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
     onPassGenerated({
       type: 'ticket',
       code: createdRecord.uniqueCode,
-      title: createdRecord.tierName || (isCouple ? '₹450 Couple Entry Pass' : '₹250 Single Person Entry Pass'),
+      title: createdRecord.tierName || (isCouple ? '₹400 Couple Entry Pass' : '₹250 Single Person Entry Pass'),
       fullName: createdRecord.partnerName 
         ? `${createdRecord.name} & ${createdRecord.partnerName}` 
         : createdRecord.name,
@@ -184,7 +184,7 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
           Book Garba &amp; DJ Night Passes
         </h1>
         <p className="mt-3 text-[#556345] text-sm sm:text-base">
-          Choose your entry: <strong className="text-[#242c18]">₹250 Single Person Entry</strong> or <strong className="text-[#242c18]">₹450 Couple Entry</strong>. Both passes include complete access to <strong className="text-[#242c18]">Garba Night &amp; DJ Night</strong>!
+          Choose your entry: <strong className="text-[#242c18]">₹250 Single Person Entry</strong> or <strong className="text-[#242c18]">₹400 Couple Entry</strong>. Both passes include complete access to <strong className="text-[#242c18]">Garba Night &amp; DJ Night</strong>!
         </p>
       </div>
 
@@ -304,7 +304,7 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
 
               <div className="pt-3 mt-4 border-t border-[#dfd7c3] text-[11px] font-bold text-[#8e6822] flex items-center gap-1.5">
                 <Check className="w-3.5 h-3.5 text-[#b3832f]" />
-                <span>Full Entry Included in ₹250 &amp; ₹450 Passes</span>
+                <span>Full Entry Included in ₹250 &amp; ₹400 Passes</span>
               </div>
             </div>
 
@@ -329,7 +329,7 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
 
               <div className="pt-3 mt-4 border-t border-[#dfd7c3] text-[11px] font-bold text-[#3b4928] flex items-center gap-1.5">
                 <Check className="w-3.5 h-3.5 text-[#5b6e41]" />
-                <span>Full Entry Included in ₹250 &amp; ₹450 Passes</span>
+                <span>Full Entry Included in ₹250 &amp; ₹400 Passes</span>
               </div>
             </div>
           </div>
@@ -338,7 +338,7 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
 
       {activeTab === 'book' ? (
         <div className="space-y-10">
-          {/* 2 Ticket Options: ₹250 Single Person Entry & ₹450 Couple Entry */}
+          {/* 2 Ticket Options: ₹250 Single Person Entry & ₹400 Couple Entry */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {/* TICKET 1: ₹250 — SINGLE PERSON ENTRY */}
             <div
@@ -442,7 +442,7 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
               </div>
             </div>
 
-            {/* TICKET 2: ₹450 — COUPLE ENTRY */}
+            {/* TICKET 2: ₹400 — COUPLE ENTRY */}
             <div
               id="tier-card-couple"
               onClick={() => setSelectedTier('couple')}
@@ -481,7 +481,7 @@ export const BookTickets: React.FC<BookTicketsProps> = ({ onPassGenerated }) => 
                 {/* Price Display */}
                 <div className="flex items-baseline gap-2 mb-2">
                   <span className="font-serif font-extrabold text-4xl text-[#242c18]">
-                    ₹450
+                    ₹400
                   </span>
                   <span className="text-[10px] text-[#556345] uppercase font-bold">
                     / couple
